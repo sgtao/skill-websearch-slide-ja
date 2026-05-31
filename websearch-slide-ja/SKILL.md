@@ -35,7 +35,11 @@ GitHubやX（Twitter）等のネット上の情報を調査・収集し、スラ
 | ファイル | 読むタイミング |
 |---------|--------------|
 | `references/source-selection.md` | Step 1-A で情報ソースを判定するとき・下限チェックを行うとき |
-| `references/search-patterns.md` | Step 1-B でロール推定するとき・Step 1-C で検索フレーズを生成するとき・Step 2 でクエリを最適化するとき |
+| `references/role-signals.md` | Step 1-B 開始時に**必ず**読む（シグナルワード照合・ヒアリング指針） |
+| `references/search-patterns/index.md` | ロールが「汎用」と判定されたとき・クロス職種テーマのとき |
+| `references/search-patterns/tech.md` | 推定ロールが技術系（エンジニア / EM / DS / デザイナー）のとき |
+| `references/search-patterns/business.md` | 推定ロールがビジネス系（PM / 経営 / マーケ / 営業 / 財務 / コンサル / オペレーション / 人事）のとき |
+| `references/search-patterns/specialist.md` | 推定ロールが専門職（法務 / 研究者 / 医療 / 教育者 / 学生 / ライター）のとき |
 | `references/slide-layouts.md` | Step 3 でスライド構成を決めるとき、Step 4 で各スライドを書くとき |
 | `references/design-tokens.md` | Step 4 でCSS変数（色・フォント）を埋め込むとき |
 | `assets/base-template.html` | Step 4 の開始時に必ずコピーして土台にする |
@@ -99,9 +103,11 @@ GitHubやX（Twitter）等のネット上の情報を調査・収集し、スラ
 | スライド枚数 | 選択モードに応じて自動決定（3枚 or 6〜10枚） | 明示的な指定がある場合はそちらを優先 |
 
 **ロール推定の手順**
-1. 会話履歴をスキャンし、`search-patterns.md` のシグナルワードを照合する
-2. 2個以上ヒットしたカテゴリを推定ロールとして採用する
-3. 推定できた場合はヒアリングをスキップする
+1. `references/role-signals.md` を読み込む（Step 1-B 開始時に**必ず**実施）
+2. 会話履歴をスキャンし、シグナルワード対応表を照合する
+3. 2個以上ヒットしたカテゴリを推定ロールとして採用し、対応する `参照ファイル` 列を確認する
+4. 推定できた場合はヒアリングをスキップし、Step 1-C へ進む
+5. 推定できなかった場合は `role-signals.md` のヒアリング指針に従って確認する
 
 ---
 
@@ -110,13 +116,14 @@ GitHubやX（Twitter）等のネット上の情報を調査・収集し、スラ
 > **スキップ条件**: Step 1-A で「会話の内容だけでOK」が確定し、かつ下限チェックで
 > 「3枚でOK」が選択された場合は、このステップをスキップし Step 3 へ進む。
 
-`references/search-patterns.md` を参照し、推定ロール × テーマから検索フレーズ候補を生成する。
+`references/role-signals.md` で特定した推定ロールに対応するファイルを読み込み、クエリを生成する。
 
 ### 手順
 
-1. Step 1-B で確定したロールに対応するクエリパターンを `search-patterns.md` から選ぶ
-2. テーマを `{}` に代入し、3〜5個の具体的な検索フレーズ候補を生成する
-3. 候補をユーザーに提示し、修正・追加・削除を受け付ける
+1. `role-signals.md` の「参照ファイル」列で該当ファイルを確認する
+2. 該当の `search-patterns/[カテゴリ].md` を読み込む（汎用の場合は `search-patterns/index.md`）
+3. ロールに対応するクエリパターンにテーマを代入し、3〜5個の具体的な検索フレーズ候補を生成する
+4. 候補をユーザーに提示し、修正・追加・削除を受け付ける
 
 **提示例（テーマ「Claude Code」、ロール「エンジニア」の場合）**
 ```
@@ -144,7 +151,7 @@ GitHubやX（Twitter）等のネット上の情報を調査・収集し、スラ
 
 ### 基本検索クエリ
 
-テーマに応じて以下を組み合わせる。職種が判明している場合は `references/search-patterns.md` を参照してクエリを最適化する。
+テーマに応じて以下を組み合わせる。職種が判明している場合は Step 1-C で読み込んだ `search-patterns/[カテゴリ].md` のクエリを優先する。
 
 **GitHub情報**
 - `{テーマ} github stars trending`

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{タイトル} | Slides</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /*
+     * ここに以下を統合する（assets/styles/ の全CSSを結合）:
+     *   1. theme-vars.css   → :root / [data-theme="dark"] のCSS変数
+     *   2. slide-core.css   → html,body / .slide-scaler / .slide / .slide-inner
+     *   3. nav-controls.css → .control-cluster / .nav-arrow / #progress-bar / #slide-counter
+     *   4. list-view.css    → body[data-view="list"] 系の全ルール
+     */
+  </style>
+</head>
+<body>
+
+  <!-- 右上コントロール（テーマ + ビュー切替） -->
+  <div class="control-cluster">
+    <button id="theme-toggle" onclick="toggleTheme()" title="テーマ切替">
+      <span id="theme-icon">🌙</span>
+    </button>
+    <button id="view-toggle" onclick="toggleView()" title="表示切替">☰</button>
+  </div>
+
+  <!-- プログレスバー（最上部） -->
+  <div id="progress-bar"></div>
+
+  <!-- スケーラー（hero時: 16:9固定中央配置、list時: 縦並びスクロール） -->
+  <div class="slide-scaler">
+
+    <!-- ナビ矢印（hero時のみ表示） -->
+    <button class="nav-arrow nav-prev" id="btn-prev" onclick="navigate(-1)">&#8249;</button>
+    <button class="nav-arrow nav-next" id="btn-next" onclick="navigate(1)">&#8250;</button>
+
+    <!-- ========== スライド本体（ここを各スライドで繰り返す） ========== -->
+    <!--
+      各スライドは <section class="slide"> で作成し、
+      中身は必ず <div class="slide-inner"> で囲む（list時のスケーリングに必要）。
+      最初のスライドのみ class="slide active" とする。
+      data-num 属性は JS が自動で付与するので不要。
+    -->
+
+    <section class="slide active" id="s1">
+      <div class="slide-inner">
+        <!-- タイトルスライド例 -->
+        <!-- references/slide-layouts.md の「タイトルスライド」を参照 -->
+        <h1>{メインタイトル}</h1>
+        <p class="subtitle">{サブタイトル}</p>
+        <div class="badges">
+          <span class="badge">GitHub ⭐</span>
+          <span class="badge">X 🐦</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s2">
+      <div class="slide-inner">
+        <!-- 2枚目以降のスライド -->
+        <!-- references/slide-layouts.md の各レイアウトを参照 -->
+      </div>
+    </section>
+
+    <!-- 以降、スライド枚数分 <section class="slide" id="sN"> を追加 -->
+
+    <!-- スライド番号（hero時のみ表示） -->
+    <div id="slide-counter">1 / N</div>
+
+  </div><!-- /.slide-scaler -->
+
+  <script>
+    /*
+     * ここに以下を統合する（assets/scripts/ の全JSを結合）:
+     *   1. fit-slide.js     → fitSlide()
+     *   2. theme-toggle.js  → toggleTheme() + 初期化
+     *   3. view-toggle.js   → toggleView() / applyView() / scaleListSlides()
+     *   4. navigation.js    → navigate() / updateArrows() / keyboard / fullscreen
+     */
+
+    // --- navigation.js の変数（他のJSから参照されるため先に宣言） ---
+    const slides = document.querySelectorAll('.slide');
+    const total  = slides.length;
+    let cur = 0;
+
+    // ここに統合したJSを貼り付ける
+  </script>
+</body>
+</html>

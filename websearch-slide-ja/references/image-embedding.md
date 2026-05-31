@@ -38,3 +38,4 @@ Step 2（画像 URL 収集）と Step 4（HTML 生成）で参照すること。
     出典: <a href="{出典ページURL}" target="_blank" rel="noopener">{出典サイト名}</a>
   </figcaption>
 </figure>
+```

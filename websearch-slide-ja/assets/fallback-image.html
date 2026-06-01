@@ -1,0 +1,50 @@
+<!--
+    fallback-image.html
+    onerror フォールバック関数の定義スニペット。
+    Step 4 の <script> ブロックにそのままコピーして使う。
+    単体で表示するファイルではない。
+-->
+<script>
+    /**
+     * 画像ロード失敗時に呼ばれるフォールバック生成関数。
+     * img の onerror から: this.parentElement.replaceWith(createFallback(url, alt))
+     *
+     * @param {string} sourceUrl - 出典ページの URL（figcaption に表示）
+     * @param {string} altText   - 画像の説明文（alt 属性と同じ文字列）
+     * @returns {HTMLElement}    - .slide-figure 要素
+     */
+    function createFallback(sourceUrl, altText) {
+        const div = document.createElement('div');
+        div.className = 'slide-figure-fallback';
+
+        const icon = document.createElement('span');
+        icon.className = 'fallback-icon';
+        icon.textContent = '🖼️';
+
+        const msg = document.createElement('span');
+        msg.textContent = '画像を読み込めませんでした';
+
+        const caption = document.createElement('figcaption');
+        if (sourceUrl) {
+            const link = document.createElement('a');
+            link.href = sourceUrl;
+            link.target = '_blank';
+            link.rel = 'noopener';
+            try {
+                link.textContent = '出典: ' + (new URL(sourceUrl).hostname);
+            } catch (e) {
+                link.textContent = '出典リンク';
+            }
+            caption.appendChild(link);
+        }
+
+        div.appendChild(icon);
+        div.appendChild(msg);
+        if (sourceUrl) div.appendChild(caption);
+
+        const figure = document.createElement('figure');
+        figure.className = 'slide-figure';
+        figure.appendChild(div);
+        return figure;
+    }
+</script>

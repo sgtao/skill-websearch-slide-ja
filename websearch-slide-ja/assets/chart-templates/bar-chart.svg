@@ -1,0 +1,69 @@
+<svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg" class="chart-svg">
+  <!-- ============================================================
+       BAR CHART TEMPLATE — 横棒グラフ
+       
+       使い方:
+         1. {TITLE}, {SOURCE}, {AXIS_X_LABEL} を実値に置換
+         2. データ行を 3〜10 本の範囲で増減
+            - <text class="chart-label">: カテゴリ名（左側）
+            - <rect class="chart-series-1">: バー本体
+            - <text class="chart-value">: 数値ラベル（バーの右端）
+         3. スケール計算（バー幅）:
+            最大値 max_val を基準に、各バー幅を以下で算出:
+              W = (val / max_val) * 480   ※ 480px は X 軸の有効幅
+            数値ラベル X 座標:
+              X_LABEL = 180 + W + 6
+         4. 5 本を超える場合は Y 座標の刻みを 40 → 30〜35 に縮める
+         5. 5 本未満の場合は不要行を削除する（要素を残さない）
+       
+       サンプルデータ:
+         タイトル: 人気VSCode拡張機能 ダウンロード数（2025年5月）
+         単位:     ダウンロード回数（百万）
+         Python:        95M  → W = 480 (基準)
+         Live Server:   41M  → W = 207
+         Prettier:      38M  → W = 192
+         ESLint:        32M  → W = 162
+         GitLens:       27M  → W = 136
+         出典:     Visual Studio Marketplace
+       ============================================================ -->
+
+  <!-- グラフタイトル -->
+  <text x="40" y="28" class="chart-title">{TITLE}</text>
+
+  <!-- 軸：Y 軸（垂直線）と X 軸（水平線） -->
+  <line x1="180" y1="50" x2="180" y2="290" class="chart-axis" />
+  <line x1="180" y1="290" x2="680" y2="290" class="chart-axis" />
+
+  <!-- X 軸ラベル（軸タイトル） -->
+  <text x="430" y="320" class="chart-axis-label" text-anchor="middle">{AXIS_X_LABEL}</text>
+
+  <!-- ─── データ行 1 ─── -->
+  <text x="170" y="78" class="chart-label" text-anchor="end">{CAT_1}</text>
+  <rect x="180" y="64" width="{W_1}" height="22" class="chart-series-1" />
+  <text x="{LABEL_X_1}" y="80" class="chart-value">{VAL_1}</text>
+
+  <!-- ─── データ行 2 ─── -->
+  <text x="170" y="118" class="chart-label" text-anchor="end">{CAT_2}</text>
+  <rect x="180" y="104" width="{W_2}" height="22" class="chart-series-1" />
+  <text x="{LABEL_X_2}" y="120" class="chart-value">{VAL_2}</text>
+
+  <!-- ─── データ行 3 ─── -->
+  <text x="170" y="158" class="chart-label" text-anchor="end">{CAT_3}</text>
+  <rect x="180" y="144" width="{W_3}" height="22" class="chart-series-1" />
+  <text x="{LABEL_X_3}" y="160" class="chart-value">{VAL_3}</text>
+
+  <!-- ─── データ行 4 ─── -->
+  <text x="170" y="198" class="chart-label" text-anchor="end">{CAT_4}</text>
+  <rect x="180" y="184" width="{W_4}" height="22" class="chart-series-1" />
+  <text x="{LABEL_X_4}" y="200" class="chart-value">{VAL_4}</text>
+
+  <!-- ─── データ行 5 ─── -->
+  <text x="170" y="238" class="chart-label" text-anchor="end">{CAT_5}</text>
+  <rect x="180" y="224" width="{W_5}" height="22" class="chart-series-1" />
+  <text x="{LABEL_X_5}" y="240" class="chart-value">{VAL_5}</text>
+
+  <!-- ─── データ行 6 以降は必要に応じて追加（Y は +40 ずつ） ─── -->
+
+  <!-- 出典（必須・SVG 右下） -->
+  <text x="680" y="350" class="chart-source" text-anchor="end">出典: {SOURCE}</text>
+</svg>

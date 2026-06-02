@@ -1,0 +1,56 @@
+# CHANGELOG
+
+このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
+
+---
+## [v0.2.0] - 2026-06-02
+
+### 追加｜Web検索した画像のスライド埋め込み（Phase 2）
+- 検索フレーズ確認時にビジュアル方針を3択（グラフ＋画像あり / グラフのみ / テキストのみ）の選択追加
+- 画像あり選択時、Web検索で取得した画像URLを `<figure class="slide-figure">` でスライドに埋め込む
+- 全画像に出典リンク（`<figcaption>`）を必須付与
+- 画像URLが無効な場合のフォールバック表示（`createFallback()`）に対応
+- 会話のみモード・「テキストのみ」選択時は画像収集を自動スキップ
+
+### 追加｜SVGグラフ自動生成（Phase 3）
+- 数値データを含むテーマで、LLMがピュアSVGのグラフを生成してスライドに埋め込む
+- 対応グラフ種別: 横棒 / 折れ線 / ドーナツ / 散布図（4種類）
+- グラフ化の可否を4条件ANDで自動判定（数値性 / 確定データ3点以上 / 出典明確 / 種別判定可能）
+- `--chart-1` 〜 `--chart-5` CSS変数でグラフ色をテーマに自動追従（ライト/ダーク両対応）
+- 外部グラフライブラリ（Chart.js・D3.js等）を使用しない完全自己完結HTML
+
+### 変更
+- Step 1-C でビジュアル選択肢「グラフ＋画像あり / グラフのみ / テキストのみ」を追加
+  - `グラフ作成＋画像あり` → 画像収集 ✅ グラフ判定 ✅
+  - `グラフ作成＋画像なし` → 画像収集 ❌ グラフ判定 ✅
+  - `テキストのみでOK`   → 画像収集 ❌ グラフ判定 ❌
+- CSSの統合順に `figure.css` → `chart.css` を追加（全6ファイル構成に変更）
+- クオリティチェックリストに画像・グラフ関連の確認項目を追加
+
+### ファイル構成の変更
+ ```
+追加:
+  assets/styles/figure.css
+  assets/styles/chart.css
+  assets/chart-templates/bar-chart.svg
+  assets/chart-templates/line-chart.svg
+  assets/chart-templates/donut-chart.svg
+  assets/chart-templates/scatter-plot.svg
+  assets/fallback-image.html
+  references/image-embedding.md
+  references/chart-generation.md
+ 
+変更:
+  assets/styles/theme-vars.css  （--chart-1〜5 系列色変数を追加）
+  assets/styles/list-view.css   （.slide-chart のはみ出し防止オーバーライドを追加）
+  SKILL.md                      （Step 1-C拡張 / Step 2画像収集 / Step 3-0グラフ判定追加）
+```
+
+---
+## [v0.1.0] - 2026-05-31
+
+- スキル起動時に情報ソース（会話のみ / ハイブリッド / Web検索メイン）を3択で選べるようになり、不要なWeb検索を自動スキップできる
+- 会話の情報量が少ない場合は自動検出して3枚ミニスライド（サマリ・本文・まとめ）または中止に誘導し、空スライド生成を防止する
+- 17職種のシグナルワード照合でユーザーのロールを自動推定し、ロール別の検索パターンファイルだけをオンデマンド読み込みすることでトークンを最大57%削減
+
+---

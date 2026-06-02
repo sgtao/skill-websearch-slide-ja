@@ -1,0 +1,90 @@
+<svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg" class="chart-svg">
+  <!-- ============================================================
+       LINE CHART TEMPLATE — 折れ線グラフ
+       
+       使い方:
+         1. {TITLE}, {SOURCE}, {AXIS_X_LABEL}, {AXIS_Y_LABEL} を置換
+         2. Y 軸目盛り {Y_MAX}, {Y_3Q}, {Y_MID}, {Y_1Q}, {Y_MIN} を最大〜最小で 5 段階に
+         3. X 軸目盛りラベル {X_1} 〜 {X_5} を時系列の時点で埋める
+         4. データ点座標の計算:
+              X(i) = 160 + (i / (N-1)) * 520    ※ i: 0始まり, N: データ点数
+              Y(v) = 290 - ((v - y_min) / (y_max - y_min)) * 220
+            ※ 5 点未満の場合は X(i) を以下で再計算:
+              X(i) = 160 + (i / (N-1)) * 520
+         5. polyline points="x1,y1 x2,y2 ..." に各点を入れる
+         6. 各点に <circle class="chart-dot chart-series-1"> と
+            <text class="chart-value"> を配置（数値ラベルは点の上 12px）
+         7. 複数系列の場合:
+            - polyline と circle/text 群を chart-line-2 / chart-series-2 で複製
+            - 凡例（SVG 右上）を有効化（コメント解除）
+       
+       サンプルデータ:
+         タイトル:    Claude モデル別 リクエスト数推移
+         軸 X:        年
+         軸 Y:        百万リクエスト/日
+         系列 1:      Claude 3.5 Sonnet
+           2023: 5,  2024: 25, 2025: 80, 2026: 150
+       ============================================================ -->
+
+  <!-- グラフタイトル -->
+  <text x="40" y="28" class="chart-title">{TITLE}</text>
+
+  <!-- 軸 -->
+  <line x1="160" y1="70" x2="160" y2="290" class="chart-axis" />
+  <line x1="160" y1="290" x2="680" y2="290" class="chart-axis" />
+
+  <!-- 軸ラベル -->
+  <text x="420" y="325" class="chart-axis-label" text-anchor="middle">{AXIS_X_LABEL}</text>
+  <text x="40" y="180" class="chart-axis-label" transform="rotate(-90, 40, 180)" text-anchor="middle">{AXIS_Y_LABEL}</text>
+
+  <!-- グリッド線（横方向・5 段階） -->
+  <line x1="160" y1="70"  x2="680" y2="70"  class="chart-grid-line" />
+  <line x1="160" y1="125" x2="680" y2="125" class="chart-grid-line" />
+  <line x1="160" y1="180" x2="680" y2="180" class="chart-grid-line" />
+  <line x1="160" y1="235" x2="680" y2="235" class="chart-grid-line" />
+
+  <!-- Y 軸目盛りラベル -->
+  <text x="155" y="74"  class="chart-label" text-anchor="end">{Y_MAX}</text>
+  <text x="155" y="129" class="chart-label" text-anchor="end">{Y_3Q}</text>
+  <text x="155" y="184" class="chart-label" text-anchor="end">{Y_MID}</text>
+  <text x="155" y="239" class="chart-label" text-anchor="end">{Y_1Q}</text>
+  <text x="155" y="294" class="chart-label" text-anchor="end">{Y_MIN}</text>
+
+  <!-- X 軸目盛りラベル（5 点想定。点数が異なる場合は調整） -->
+  <text x="160" y="306" class="chart-label" text-anchor="middle">{X_1}</text>
+  <text x="290" y="306" class="chart-label" text-anchor="middle">{X_2}</text>
+  <text x="420" y="306" class="chart-label" text-anchor="middle">{X_3}</text>
+  <text x="550" y="306" class="chart-label" text-anchor="middle">{X_4}</text>
+  <text x="680" y="306" class="chart-label" text-anchor="middle">{X_5}</text>
+
+  <!-- ─── 系列 1: 折れ線（5 点）─── -->
+  <polyline
+    points="{P1_X},{P1_Y} {P2_X},{P2_Y} {P3_X},{P3_Y} {P4_X},{P4_Y} {P5_X},{P5_Y}"
+    class="chart-line-1" />
+
+  <!-- ─── 系列 1: データ点と数値ラベル ─── -->
+  <circle cx="{P1_X}" cy="{P1_Y}" r="4" class="chart-dot chart-series-1" />
+  <text x="{P1_X}" y="{P1_LABEL_Y}" class="chart-value" text-anchor="middle">{V1_1}</text>
+
+  <circle cx="{P2_X}" cy="{P2_Y}" r="4" class="chart-dot chart-series-1" />
+  <text x="{P2_X}" y="{P2_LABEL_Y}" class="chart-value" text-anchor="middle">{V1_2}</text>
+
+  <circle cx="{P3_X}" cy="{P3_Y}" r="4" class="chart-dot chart-series-1" />
+  <text x="{P3_X}" y="{P3_LABEL_Y}" class="chart-value" text-anchor="middle">{V1_3}</text>
+
+  <circle cx="{P4_X}" cy="{P4_Y}" r="4" class="chart-dot chart-series-1" />
+  <text x="{P4_X}" y="{P4_LABEL_Y}" class="chart-value" text-anchor="middle">{V1_4}</text>
+
+  <circle cx="{P5_X}" cy="{P5_Y}" r="4" class="chart-dot chart-series-1" />
+  <text x="{P5_X}" y="{P5_LABEL_Y}" class="chart-value" text-anchor="middle">{V1_5}</text>
+
+  <!-- ─── 凡例（2 系列以上のときコメントを解除して使う） ───
+  <rect x="540" y="50" width="12" height="3" class="chart-series-1" />
+  <text x="558" y="55" class="chart-legend">{SERIES_1_NAME}</text>
+  <rect x="540" y="65" width="12" height="3" class="chart-series-2" />
+  <text x="558" y="70" class="chart-legend">{SERIES_2_NAME}</text>
+  -->
+
+  <!-- 出典（必須・SVG 右下） -->
+  <text x="680" y="350" class="chart-source" text-anchor="end">出典: {SOURCE}</text>
+</svg>

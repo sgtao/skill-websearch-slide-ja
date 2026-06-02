@@ -89,3 +89,10 @@ body[data-view="list"] #slide-counter,
 body[data-view="list"] #progress-bar {
   display: none;
 }
+
+/* ─── チャート: list モードでもスライド枠からはみ出さないようにする ─── */
+/* .chart-svg は overflow:visible だが、親 .slide-chart で抑制する */
+body[data-view="list"] .slide-inner .slide-chart {
+  max-width: 100%;
+  overflow: hidden;
+}

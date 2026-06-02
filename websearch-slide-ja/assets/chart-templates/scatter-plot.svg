@@ -1,0 +1,73 @@
+<svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg" class="chart-svg">
+  <!-- ============================================================
+       SCATTER PLOT TEMPLATE — 散布図
+       
+       使い方:
+         1. {TITLE}, {SOURCE}, {AXIS_X_LABEL}, {AXIS_Y_LABEL} を置換
+         2. Y 軸目盛り {Y_MAX}, {Y_MID}, {Y_MIN} を最小〜最大の代表値で
+         3. X 軸目盛り {X_MIN}, {X_MID}, {X_MAX} を埋める
+         4. 各データ点の座標計算:
+              X = 160 + ((vx - x_min) / (x_max - x_min)) * 520
+              Y = 290 - ((vy - y_min) / (y_max - y_min)) * 220
+         5. 5〜20 点を想定。点数が多い場合は <circle> ブロックを複製
+         6. ラベル付き点では <text class="chart-value"> を点の右側 8px に配置
+         7. 2 系列以上にする場合は chart-series-2 等で色分け
+       
+       サンプルデータ:
+         タイトル: VSCode 拡張機能 スター数 × ダウンロード数
+         X 軸:     GitHub スター数
+         Y 軸:     週間ダウンロード数（万）
+         点 1:     Prettier        (45000, 800)
+         点 2:     ESLint          (24000, 600)
+         点 3:     GitLens         (8500,  500)
+         点 4:     Python ext.     (3500,  1500)
+         点 5:     Live Server     (1700,  500)
+       ============================================================ -->
+
+  <!-- グラフタイトル -->
+  <text x="40" y="28" class="chart-title">{TITLE}</text>
+
+  <!-- 軸 -->
+  <line x1="160" y1="70" x2="160" y2="290" class="chart-axis" />
+  <line x1="160" y1="290" x2="680" y2="290" class="chart-axis" />
+
+  <!-- 軸ラベル -->
+  <text x="420" y="325" class="chart-axis-label" text-anchor="middle">{AXIS_X_LABEL}</text>
+  <text x="40" y="180" class="chart-axis-label" transform="rotate(-90, 40, 180)" text-anchor="middle">{AXIS_Y_LABEL}</text>
+
+  <!-- グリッド線 -->
+  <line x1="160" y1="125" x2="680" y2="125" class="chart-grid-line" />
+  <line x1="160" y1="180" x2="680" y2="180" class="chart-grid-line" />
+  <line x1="160" y1="235" x2="680" y2="235" class="chart-grid-line" />
+
+  <!-- Y 軸目盛りラベル -->
+  <text x="155" y="74"  class="chart-label" text-anchor="end">{Y_MAX}</text>
+  <text x="155" y="184" class="chart-label" text-anchor="end">{Y_MID}</text>
+  <text x="155" y="294" class="chart-label" text-anchor="end">{Y_MIN}</text>
+
+  <!-- X 軸目盛りラベル -->
+  <text x="160" y="306" class="chart-label" text-anchor="middle">{X_MIN}</text>
+  <text x="420" y="306" class="chart-label" text-anchor="middle">{X_MID}</text>
+  <text x="680" y="306" class="chart-label" text-anchor="middle">{X_MAX}</text>
+
+  <!-- ─── データ点（サンプル: 5 点）─── -->
+  <circle cx="{P1_X}" cy="{P1_Y}" r="5" class="chart-dot chart-series-1" />
+  <text x="{P1_LABEL_X}" y="{P1_LABEL_Y}" class="chart-value">{P1_NAME}</text>
+
+  <circle cx="{P2_X}" cy="{P2_Y}" r="5" class="chart-dot chart-series-1" />
+  <text x="{P2_LABEL_X}" y="{P2_LABEL_Y}" class="chart-value">{P2_NAME}</text>
+
+  <circle cx="{P3_X}" cy="{P3_Y}" r="5" class="chart-dot chart-series-1" />
+  <text x="{P3_LABEL_X}" y="{P3_LABEL_Y}" class="chart-value">{P3_NAME}</text>
+
+  <circle cx="{P4_X}" cy="{P4_Y}" r="5" class="chart-dot chart-series-1" />
+  <text x="{P4_LABEL_X}" y="{P4_LABEL_Y}" class="chart-value">{P4_NAME}</text>
+
+  <circle cx="{P5_X}" cy="{P5_Y}" r="5" class="chart-dot chart-series-1" />
+  <text x="{P5_LABEL_X}" y="{P5_LABEL_Y}" class="chart-value">{P5_NAME}</text>
+
+  <!-- 6 点以上のときはこの後ろに <circle> + <text> を複製して追加 -->
+
+  <!-- 出典（必須・SVG 右下） -->
+  <text x="680" y="350" class="chart-source" text-anchor="end">出典: {SOURCE}</text>
+</svg>

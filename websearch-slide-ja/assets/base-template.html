@@ -7,22 +7,45 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     /*
-     * ここに以下を統合する（assets/styles/ の全CSSを結合）:
+     * ここに以下を統合する（assets/styles/ の全CSSを結合・全 7 ファイル）:
      *   1. theme-vars.css   → :root / [data-theme="dark"] のCSS変数
      *   2. slide-core.css   → html,body / .slide-scaler / .slide / .slide-inner
      *   3. nav-controls.css → .control-cluster / .nav-arrow / #progress-bar / #slide-counter
-     *   4. list-view.css    → body[data-view="list"] 系の全ルール
+     *                          + .export-menu / .export-dropdown (Phase 3 で追加)
+     *   4. figure.css       → .slide-figure / .slide-figure-fallback (Phase 2)
+     *   5. chart.css        → .chart-* / .slide-chart (Phase 2 グラフ)
+     *   6. list-view.css    → body[data-view="list"] 系の全ルール
+     *   7. print.css        → @media print + .exporting-pdf (Phase 3 で追加)
      */
   </style>
 </head>
 <body>
 
-  <!-- 右上コントロール（テーマ + ビュー切替） -->
+  <!-- 右上コントロール（テーマ + ビュー切替 + エクスポート） -->
   <div class="control-cluster">
-    <button id="theme-toggle" onclick="toggleTheme()" title="テーマ切替">
+    <button id="theme-toggle" onclick="toggleTheme()" title="テーマ切替（クリック）">
       <span id="theme-icon">🌙</span>
     </button>
-    <button id="view-toggle" onclick="toggleView()" title="表示切替">☰</button>
+    <button id="view-toggle" onclick="toggleView()" title="表示切替（V）">☰</button>
+
+    <!-- ▼ Phase 3: エクスポートメニュー -->
+    <div class="export-menu">
+      <button id="export-toggle" onclick="toggleExportMenu()" title="エクスポート">📥</button>
+      <div id="export-dropdown" class="export-dropdown" hidden role="menu">
+        <button type="button" role="menuitem"
+                onclick="exportPDF(); closeExportMenu();">
+          📄 PDFとして印刷 <span class="kbd">P</span>
+        </button>
+        <button type="button" role="menuitem"
+                onclick="exportSinglePNG(); closeExportMenu();">
+          🖼️ このスライドをPNG <span class="kbd">Shift+S</span>
+        </button>
+        <button type="button" role="menuitem"
+                onclick="exportAllPNG(); closeExportMenu();">
+          📦 全スライドをZIP <span class="kbd">Shift+P</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- プログレスバー（最上部） -->
@@ -72,11 +95,17 @@
 
   <script>
     /*
-     * ここに以下を統合する（assets/scripts/ の全JSを結合）:
+     * ここに以下を統合する（assets/scripts/ の全JSを結合・全 6 ファイル）:
      *   1. fit-slide.js     → fitSlide()
      *   2. theme-toggle.js  → toggleTheme() + 初期化
      *   3. view-toggle.js   → toggleView() / applyView() / scaleListSlides()
      *   4. navigation.js    → navigate() / updateArrows() / keyboard / fullscreen
+     *                          + エクスポート系ショートカット (Phase 3 で追加)
+     *   5. export-pdf.js    → exportPDF() / toggleExportMenu() / closeExportMenu() (Phase 3)
+     *   6. export-png.js    → exportSinglePNG() / exportAllPNG() / loadScript() (Phase 3)
+     *
+     * 注: export-pdf.js / export-png.js は CDN を動的ロードする。
+     *     閲覧時は外部リソースなしで動作し、エクスポート操作時のみネット接続が必要。
      */
 
     // --- navigation.js の変数（他のJSから参照されるため先に宣言） ---

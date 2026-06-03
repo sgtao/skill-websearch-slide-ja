@@ -9,10 +9,15 @@
  *
  * 設計原則:
  *   1. 外部 CDN は「エクスポート操作時のみ」動的ロード。閲覧自体は完全自己完結を維持。
- *   2. 2 回目以降の呼び出しではロード済み <script> を再利用（重複ロードなし）。
+ *   2. 2 回目以降の呼び出しではロード済み <script> を再利用（重複ロードなし)。
  *   3. エラーは alert で明示通知。console.error だけだとユーザーが気づかない。
  *   4. キャプチャ範囲は .slide 要素そのもの（960×540 のネイティブサイズ）。
- *      hero モードの transform: scale() の影響を受けないよう width/height を明示指定。
+ *      hero モードの transform: scale() の影響を受けないよう、
+ *      onclone でクローン DOM 側の transform を明示的に解除する。
+ *
+ * v0.2.1 修正:
+ *   - hero モードでの右端切れバグを修正（onclone フックで transform を解除）
+ *   - print.css の二重防御と同じ哲学を PNG キャプチャにも適用
  */
 
 /* ==========================================================================
@@ -56,6 +61,10 @@ function loadScript(src) {
  * html2canvas のオプションを生成する。
  * 現在のテーマ背景色を引き継ぐため、関数化して都度呼び出す。
  *
+ * v0.2.1 で onclone フックを追加。hero モードの transform: scale() による
+ * getBoundingClientRect ずれを回避するため、クローン DOM 側で transform を解除する。
+ * 画面表示には一切影響しない（クローン DOM のみが対象）。
+ *
  * @returns {object} html2canvas のオプション
  */
 function buildCanvasOptions() {
@@ -67,6 +76,51 @@ function buildCanvasOptions() {
         allowTaint: false,     // 汚染キャンバスは作らない（CORS NG の画像は欠落させる）
         backgroundColor: getComputedStyle(document.body).backgroundColor,
         logging: false,        // コンソールログを抑制
+
+        /**
+         * クローン DOM に対する事前操作（v0.2.1 で追加）。
+         *
+         * 画面表示には一切影響せず、html2canvas が見るクローン DOM だけを修正する。
+         * 修正内容は print.css の @media print と同じ哲学:
+         *   hero モードの transform: scale() / position: fixed / opacity: 0 を解除して、
+         *   素のレイアウト（960×540 の box）でキャプチャできるようにする。
+         *
+         * @param {Document} clonedDoc - html2canvas が複製した DOM ツリー
+         */
+        onclone: (clonedDoc) => {
+            // 3-1. .slide-scaler の position/transform を解除
+            //      hero モードの「position: fixed + transform: scale()」を素の配置に戻す。
+            //      これで getBoundingClientRect が CSS の 960×540 と一致する。
+            const scaler = clonedDoc.querySelector('.slide-scaler');
+            if (scaler) {
+                scaler.style.position = 'static';
+                scaler.style.top = 'auto';
+                scaler.style.left = 'auto';
+                scaler.style.transform = 'none';
+                scaler.style.width = '960px';
+                scaler.style.height = '540px';
+            }
+
+            // 3-2. 全 .slide を relative + opacity:1 に強制
+            //      hero モードの「position: absolute + inset: 0 + opacity: 0」を解除し、
+            //      キャプチャ対象スライドが確実に可視化される状態にする。
+            clonedDoc.querySelectorAll('.slide').forEach((s) => {
+                s.style.position = 'relative';
+                s.style.inset = 'auto';
+                s.style.top = 'auto';
+                s.style.left = 'auto';
+                s.style.transform = 'none';
+                s.style.opacity = '1';
+                s.style.pointerEvents = 'auto';
+            });
+
+            // 3-3. .slide-inner の scale を解除
+            //      list モードからキャプチャされたケースの保険。
+            //      view-toggle.js が scaleListSlides() で setしている transform を解除する。
+            clonedDoc.querySelectorAll('.slide-inner').forEach((inner) => {
+                inner.style.transform = 'none';
+            });
+        },
     };
 }
 
@@ -142,8 +196,7 @@ async function exportAllPNG() {
         const zip = new JSZip();
 
         // 4. 各スライドを順にキャプチャして ZIP に追加
-        //    list モードでもキャプチャ可能だが、hero モードのほうがレイアウト計算が安定する
-        //    ここでは現在のモードを維持し、html2canvas の width/height 指定で原寸を強制する
+        //    onclone で transform を解除しているため、hero/list どちらのモードでも正常にキャプチャできる
         for (let i = 0; i < allSlides.length; i++) {
             const canvas = await html2canvas(allSlides[i], buildCanvasOptions());
             const dataUrl = canvas.toDataURL('image/png');

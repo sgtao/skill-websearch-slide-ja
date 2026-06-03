@@ -3,16 +3,59 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.3.0] - 2026-06-03
+
+### 追加｜PDF / PNG / ZIP エクスポート機能
+
+- 生成HTMLから PDF・単一PNG・全スライドZIP の3種類のエクスポートが可能になった
+- **PDF（`P` キー / 📥メニュー）**: 標準 `window.print()` 経由で印刷ダイアログを起動。1スライド=1ページ。外部ライブラリ不要、オフラインでも動作
+- **単一PNG（`Shift+S` / 📥メニュー）**: html2canvas（CDN動的ロード）で現在スライドを 1920×1080 PNG でダウンロード
+- **全スライドZIP（`Shift+P` / 📥メニュー）**: html2canvas + JSZip（CDN動的ロード）で全スライドを連番PNG（slide-01.png…）として ZIP 化してダウンロード
+- コントロールクラスタ右端に 📥 エクスポートメニューボタンを追加。ドロップダウンに3種の操作とキーボードショートカットを表示
+- キーボードショートカット `P` / `Shift+S` / `Shift+P` を追加（Ctrl/Cmd・入力フィールド上での誤発火を防ぐ安全装置つき）
+- **hero / list 両モード対応のPDF出力（二重防御）**: `exportPDF()` 経由と `Ctrl+P` 直接押下のどちらでも 1ページ=1スライドが成立するよう `print.css` の `@media print` 内で hero モードの `opacity` / `position` / `transform` をすべて上書き
+- 閲覧は外部リソース不要の自己完結を維持。エクスポート操作時のみ CDN を動的ロード。ネット不通時でも PDF は確実に動作
+- CORS NG 画像がある場合は `createFallback()` でプレースホルダーとして PNG に焼き込み、エクスポート失敗を防止
+- エクスポート失敗時は `alert()` で原因と代替手段（PDF）を案内
+
+### 修正
+
+- **Export PNG/ZIP の右端切れ修正**: hero モード時に `html2canvas` が `getBoundingClientRect()` で `transform: scale()` 適用後の物理サイズを取得してしまい、出力画像の右端が約46%欠落していた問題を修正。`onclone` フックでクローン DOM の `transform` を解除することで画面表示に影響なく解決
+
+### 変更
+
+- CSSの統合順に `print.css` を追加（全7ファイル構成に変更）
+- JSの統合順に `export-pdf.js` → `export-png.js` を追加（全6ファイル構成に変更）
+- クオリティチェックリストにエクスポート関連の確認項目を追加
+- SKILL.md をスリム化（508行→329行、約35%削減）。詳細実装を references/ に委ね、スキップ条件を早見表に集約、チェックリストをA〜Gの7カテゴリに再構成
+
+### ファイル構成の変更
+
+```
+追加:
+  assets/styles/print.css
+  assets/scripts/export-pdf.js
+  assets/scripts/export-png.js
+  references/export-recipes.md
+
+変更:
+  assets/base-template.html       （.export-menu ブロック追加）
+  assets/styles/nav-controls.css  （.export-dropdown スタイル追加）
+  assets/scripts/navigation.js    （P / Shift+S / Shift+P ショートカット追加）
+  SKILL.md                        （Step 4拡張 / エクスポート組み込み手順 / チェックリスト追加 / スリム化）
+```
+
+---
 ## [v0.2.0] - 2026-06-02
 
-### 追加｜Web検索した画像のスライド埋め込み（Phase 2）
+### 追加｜Web検索した画像のスライド埋め込み
 - 検索フレーズ確認時にビジュアル方針を3択（グラフ＋画像あり / グラフのみ / テキストのみ）の選択追加
 - 画像あり選択時、Web検索で取得した画像URLを `<figure class="slide-figure">` でスライドに埋め込む
 - 全画像に出典リンク（`<figcaption>`）を必須付与
 - 画像URLが無効な場合のフォールバック表示（`createFallback()`）に対応
 - 会話のみモード・「テキストのみ」選択時は画像収集を自動スキップ
 
-### 追加｜SVGグラフ自動生成（Phase 3）
+### 追加｜SVGグラフ自動生成
 - 数値データを含むテーマで、LLMがピュアSVGのグラフを生成してスライドに埋め込む
 - 対応グラフ種別: 横棒 / 折れ線 / ドーナツ / 散布図（4種類）
 - グラフ化の可否を4条件ANDで自動判定（数値性 / 確定データ3点以上 / 出典明確 / 種別判定可能）
@@ -28,7 +71,7 @@
 - クオリティチェックリストに画像・グラフ関連の確認項目を追加
 
 ### ファイル構成の変更
- ```
+```
 追加:
   assets/styles/figure.css
   assets/styles/chart.css
@@ -39,7 +82,7 @@
   assets/fallback-image.html
   references/image-embedding.md
   references/chart-generation.md
- 
+
 変更:
   assets/styles/theme-vars.css  （--chart-1〜5 系列色変数を追加）
   assets/styles/list-view.css   （.slide-chart のはみ出し防止オーバーライドを追加）
@@ -52,5 +95,3 @@
 - スキル起動時に情報ソース（会話のみ / ハイブリッド / Web検索メイン）を3択で選べるようになり、不要なWeb検索を自動スキップできる
 - 会話の情報量が少ない場合は自動検出して3枚ミニスライド（サマリ・本文・まとめ）または中止に誘導し、空スライド生成を防止する
 - 17職種のシグナルワード照合でユーザーのロールを自動推定し、ロール別の検索パターンファイルだけをオンデマンド読み込みすることでトークンを最大57%削減
-
----

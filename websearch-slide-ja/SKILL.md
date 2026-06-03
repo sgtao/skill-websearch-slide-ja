@@ -1,67 +1,68 @@
 ---
 name: websearch-slide-ja
 description: >
-  GitHubやX（Twitter）などのネット上の公開情報（人気Skill、使い方Tips、技術トレンド等）を
-  Web検索で収集し、スライド形式のHTMLページとして生成するスキル。
-  「スライドを作って」「プレゼン資料にして」「HTMLスライドで説明して」「〇〇についてスライドにまとめて」
-  「GitHubのトレンドをスライドで」「Xで話題の〇〇をスライドに」などのフレーズが含まれる場合は必ずこのスキルを使う。
-  ネット情報の収集 → 構造化 → HTMLスライド生成まで一気通貫で行う。
-  生成HTMLは PDF（印刷ダイアログ経由）と PNG（個別 / zip）のエクスポートに対応。
+  GitHubやX（Twitter）などのネット上の公開情報を Web検索で収集し、
+  スライド形式のHTMLページとして生成するスキル。
+  「スライドを作って」「プレゼン資料にして」「HTMLスライドで説明して」
+  「〇〇についてスライドにまとめて」「GitHubのトレンドをスライドで」
+  「Xで話題の〇〇をスライドに」などのフレーズが含まれる場合は必ずこのスキルを使う。
+  生成HTMLは PDF（印刷経由）と PNG（個別 / zip）のエクスポートに対応。
 ---
 
 # Slide Generator Skill with Web Search (Japanese)
 
-GitHubやX（Twitter）等のネット上の情報を調査・収集し、スライド形式のHTMLページを生成するスキル。
-
----
+ネット上の情報を調査・収集し、スライド形式のHTMLページを生成するスキル。
 
 ## ワークフロー概要
 
 ```
 1-A. 情報ソース確認（会話のみ / ハイブリッド / Web検索メイン）
 1-B. テーマ・ロール確認
-1-C. 検索フレーズ提案（Web検索する場合のみ）
-2.   Web検索・情報収集（「会話のみ」選択時はスキップ）
-3-0. グラフ化判定（数値テーマのみ）
-3.   情報の構造化・スライド構成の設計
+1-C. 検索フレーズ提案＋ビジュアル方針確認
+2.   Web検索・情報収集
+3-0. グラフ化判定
+3.   スライド構成の設計
 4.   HTMLスライド生成（エクスポート機能込み）
 5.   ファイル出力・提示
 ```
 
----
-
 ## 参照ファイルガイド
 
-このSkillは以下の参照ファイル・アセットを持つ。各ステップで該当ファイルを必ず読むこと。
+各ステップで該当ファイルを必ず読むこと。
 
 | ファイル | 読むタイミング |
 |---------|--------------|
-| `references/source-selection.md` | Step 1-A で情報ソースを判定するとき・下限チェックを行うとき |
-| `references/role-signals.md` | Step 1-B 開始時に**必ず**読む（シグナルワード照合・ヒアリング指針） |
-| `references/search-patterns/index.md` | ロールが「汎用」と判定されたとき・クロス職種テーマのとき |
-| `references/search-patterns/tech.md` | 推定ロールが技術系（エンジニア / EM / DS / デザイナー）のとき |
-| `references/search-patterns/business.md` | 推定ロールがビジネス系（PM / 経営 / マーケ / 営業 / 財務 / コンサル / オペレーション / 人事）のとき |
-| `references/search-patterns/specialist.md` | 推定ロールが専門職（法務 / 研究者 / 医療 / 教育者 / 学生 / ライター）のとき |
-| `references/slide-layouts.md` | Step 3 でスライド構成を決めるとき、Step 4 で各スライドを書くとき |
-| `references/design-tokens.md` | Step 4 でCSS変数（色・フォント）を埋め込むとき |
-| `references/image-embedding.md` | Step 2 で画像 URL を収集するとき・Step 4 で画像を埋め込むとき |
-| `references/chart-generation.md` | Step 3-0 でグラフ化判定をするとき・Step 4 でグラフを埋め込むとき |
-| `references/export-recipes.md` | Step 4 でエクスポート機能（PDF/PNG/ZIP）を組み込むとき |
-| `assets/base-template.html` | Step 4 の開始時に必ずコピーして土台にする |
-| `assets/styles/*.css` | テンプレートに埋め込むCSS群（theme-vars / slide-core / nav-controls / figure / chart / list-view / **print** の順で統合・全 **7 ファイル**） |
-| `assets/scripts/*.js` | テンプレートに埋め込むJS群（fit-slide / theme-toggle / view-toggle / navigation / **export-pdf / export-png** の順で統合・全 **6 ファイル**） |
-| `assets/fallback-image.html` | Step 4 で画像を埋め込む場合、`<script>` に `createFallback()` をコピーする |
-| `assets/chart-templates/*.svg` | Step 4 でグラフを埋め込む場合、該当テンプレートをコピーして値を埋める（bar / line / donut / scatter） |
+| `references/source-selection.md` | Step 1-A：情報ソース判定・下限チェック |
+| `references/role-signals.md` | Step 1-B 開始時に**必ず**読む |
+| `references/search-patterns/index.md` | ロールが「汎用」のとき |
+| `references/search-patterns/tech.md` | 技術系（エンジニア / EM / DS / デザイナー） |
+| `references/search-patterns/business.md` | ビジネス系（PM / 経営 / マーケ / 営業 / 財務 / コンサル / オペレーション / 人事） |
+| `references/search-patterns/specialist.md` | 専門職（法務 / 研究者 / 医療 / 教育者 / 学生 / ライター） |
+| `references/slide-layouts.md` | Step 3 構成設計、Step 4 各スライド作成時 |
+| `references/design-tokens.md` | Step 4：CSS変数・カラー埋め込み |
+| `references/image-embedding.md` | Step 2 画像収集、Step 4 画像埋め込み |
+| `references/chart-generation.md` | Step 3-0 グラフ化判定、Step 4 グラフ埋め込み |
+| `references/export-recipes.md` | Step 4：エクスポート機能（PDF/PNG/ZIP）組み込み |
+| `assets/base-template.html` | Step 4 開始時に必ずコピーして土台にする |
+| `assets/styles/*.css` | 全 7 ファイルを統合（theme-vars → slide-core → nav-controls → figure → chart → list-view → print） |
+| `assets/scripts/*.js` | 全 6 ファイルを統合（fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png） |
+| `assets/fallback-image.html` | 画像埋め込み時に `createFallback()` をコピー |
+| `assets/chart-templates/*.svg` | グラフ埋め込み時に該当テンプレートをコピー |
+
+## ステップ別スキップ条件（早見表）
+
+| ビジュアル方針 / モード | Step 2 画像収集 | Step 2 数値抽出 | Step 3-0 グラフ化 |
+|---|---|---|---|
+| Web検索あり × グラフ作成＋画像あり | 実行 | 実行 | 実行 |
+| Web検索あり × グラフ作成＋画像なし | スキップ | 実行 | 実行 |
+| Web検索あり × テキストのみ | スキップ | スキップ | スキップ |
+| 会話のみモード（3枚ミニ含む） | スキップ | 原則スキップ | 原則スキップ |
 
 ---
 
 ## Step 1-A: 情報ソース確認
 
-`references/source-selection.md` を参照し、以下の手順で情報ソースを確定する。
-
-### 1. `ask_user_input_v0` で選択肢を提示
-
-スキル起動直後に必ず以下の選択肢をユーザーに提示する。
+`references/source-selection.md` を参照し、`ask_user_input_v0` で 3 択を提示する。
 
 ```
 質問: スライド作成にどの情報を使いますか？
@@ -71,84 +72,56 @@ GitHubやX（Twitter）等のネット上の情報を調査・収集し、スラ
   - 「Web検索メインで（検索中心）」
 ```
 
-### 2. 「会話の内容だけでOK」選択時 — 下限チェック
+### 「会話の内容だけでOK」選択時の下限チェック
 
-`references/source-selection.md` の4観点チェックを実施する。
+`source-selection.md` の 4 観点（トピック数・具体性・分量・構造化可能性）をチェック。
 
-- **不足なし**（2観点未満が該当）→ **通常モード（6〜10枚）** で Step 1-B へ
-- **不足あり**（2観点以上が該当）→ 以下の再確認を行う
+- **不足なし**（2観点未満が該当）→ 通常モード（6〜10枚）で Step 1-B へ
+- **不足あり**（2観点以上が該当）→ 再確認の 3 択を提示：
+  - 「Web検索で補う」→ ハイブリッドモード → Step 1-C へ
+  - 「3枚でOK」→ 3 枚ミニモード確定 → Step 1-B へ
+  - 「作成を中止する」→ 終了メッセージを出して処理を止める（検索・生成は一切行わない）
 
-**再確認メッセージ（例）**
-
-> 「会話の情報量が少ないため、サマリ・本文・まとめの3枚スライドで提案します。
-> どうしますか？」
-
-再確認の選択肢:
-
-- 「Web検索で補う（6〜10枚）」→ **ハイブリッドモード** → Step 1-C へ
-- 「3枚でOK（ミニモード）」  → **3枚ミニモード確定** → Step 1-B へ
-- 「作成を中止する」         → **スキルを終了** → 終了メッセージを出して処理を止める
-
-> **中止時の終了メッセージ例**
-> 「承知しました。テーマや情報が整ったら改めてお声がけください。」
-> → それ以上の処理（検索・生成）は一切行わない。
-
-### 3. その他の選択時
-
-- 「Web検索も追加する」→ **ハイブリッドモード** → Step 1-B へ
-- 「Web検索メインで」 → **Webメインモード**（従来動作） → Step 1-B へ
+その他の選択時:
+- 「Web検索も追加する」→ ハイブリッドモード → Step 1-B へ
+- 「Web検索メインで」→ Web メインモード → Step 1-B へ
 
 ---
 
 ## Step 1-B: テーマ・ロール確認
 
-会話履歴から以下を自動抽出し、不足分のみユーザーにヒアリングする。
-
-| 項目 | 抽出方法 | 不足時の対応 |
-|------|---------|------------|
-| テーマ | 会話履歴の主題から推定 | 「何についてのスライドですか？」と質問 |
-| 対象読者 | 文脈から推定（社内向け／顧客向けなど） | 「誰に見せるスライドですか？」と質問 |
-| ユーザーロール | `references/search-patterns.md` の「ロール推定ヒント」で照合 | 職種シグナルが0件の場合のみ確認 |
-| スライド枚数 | 選択モードに応じて自動決定（3枚 or 6〜10枚） | 明示的な指定がある場合はそちらを優先 |
+会話履歴から **テーマ / 対象読者 / ユーザーロール** を抽出。不足分のみヒアリングする。
+スライド枚数は選択モードに従う（3 枚 or 6〜10 枚）。
 
 **ロール推定の手順**
 
-1. `references/role-signals.md` を読み込む（Step 1-B 開始時に**必ず**実施）
-2. 会話履歴をスキャンし、シグナルワード対応表を照合する
-3. 2個以上ヒットしたカテゴリを推定ロールとして採用し、対応する `参照ファイル` 列を確認する
-4. 推定できた場合はヒアリングをスキップし、Step 1-C へ進む
-5. 推定できなかった場合は `role-signals.md` のヒアリング指針に従って確認する
+1. `references/role-signals.md` を読み込む（必ず実施）
+2. 会話履歴のシグナルワードを照合し、2 個以上ヒットしたカテゴリを採用
+3. 推定できた場合はヒアリングをスキップして Step 1-C へ
+4. 推定できなかった場合は `role-signals.md` のヒアリング指針に従って確認
 
 ---
 
-## Step 1-C: 検索フレーズ提案
+## Step 1-C: 検索フレーズ提案＋ビジュアル方針確認
 
-> **スキップ条件**: Step 1-A で「会話の内容だけでOK」が確定し、かつ下限チェックで
-> 「3枚でOK」が選択された場合は、このステップをスキップし Step 3 へ進む。
-
-`references/role-signals.md` で特定した推定ロールに対応するファイルを読み込み、クエリを生成する。
+> **スキップ条件**: Step 1-A で「会話のみ」かつ「3 枚でOK」確定時はスキップして Step 3 へ。
 
 ### 手順
 
-1. `role-signals.md` の「参照ファイル」列で該当ファイルを確認する
-2. 該当の `search-patterns/[カテゴリ].md` を読み込む（汎用の場合は `search-patterns/index.md`）
-3. ロールに対応するクエリパターンにテーマを代入し、**デフォルト3個**の検索フレーズ候補を生成する
-   - 3個がデフォルト（トークン節約・検索回数削減のため）
-   - テーマが広い・複数視点が必要な場合は最大5個まで増やしてよい
-4. 候補をユーザーに提示し、修正・追加・削除を受け付ける
+1. `role-signals.md` の「参照ファイル」列で該当の `search-patterns/[カテゴリ].md` を読む（汎用なら `index.md`）
+2. ロール × テーマで **デフォルト 3 個**の検索フレーズ候補を生成（広範テーマは最大 5 個まで）
+3. ユーザーに提示し、修正・追加・削除を受け付ける
 
-**提示例（テーマ「Claude Code」、ロール「エンジニア」の場合）**
+**提示例（テーマ「Claude Code」、ロール「エンジニア」）**
 
 ```
 以下の検索フレーズで情報を集めようと思います。修正・追加はありますか？
-（デフォルト3本。追加が必要なら教えてください）
-
 1. claude code skill github stars
 2. claude code tips tricks 2025
 3. claude code 使い方 まとめ site:zenn.dev
 ```
 
-5. 検索フレーズの確認と同時に、`ask_user_input_v0` で以下も尋ねる：
+4. 同時に `ask_user_input_v0` でビジュアル方針を確認：
 
 ```
 質問: スライドにグラフや画像を含めますか？
@@ -158,166 +131,87 @@ GitHubやX（Twitter）等のネット上の情報を調査・収集し、スラ
   - 「テキストのみでOK」
 ```
 
-選択結果を **ビジュアル方針** として記録し、以降のステップで参照する：
-
-| ビジュアル方針 | 画像収集（Step 2） | グラフ化判定（Step 3-0） |
-|---|---|---|
-| グラフ作成＋画像あり | 実行する | 実行する |
-| グラフ作成＋画像なし | スキップ | 実行する |
-| テキストのみでOK | スキップ | スキップ |
-
-6. ユーザーの確認・修正後、確定したフレーズとビジュアル方針を記録して Step 2 へ進む
+5. 確定したフレーズとビジュアル方針を記録して Step 2 へ
 
 ---
 
 ## Step 2: Web検索・情報収集
 
-> **スキップ条件**: Step 1-A で「会話の内容だけでOK」が選択され、
-> かつ Step 1-C をスキップした場合は、このステップを実行しない。
-> 代わりに会話履歴から情報を構造化し、Step 3 へ直接進む。
->
-> **ハイブリッドモード**: 会話履歴の情報を先に構造化し、
-> 不足するトピック・具体例・数値を以下の検索で補完する。
+> **スキップ条件**: Step 1-A で「会話のみ」+ Step 1-C スキップ時は実行しない。会話履歴を構造化して Step 3 へ。
+> **ハイブリッドモード**: 会話履歴を一次情報として先に構造化し、不足分のみ Web 検索で補完する。
 
-### 基本検索クエリ
+### 検索クエリと回数
 
-テーマに応じて以下を組み合わせる。職種が判明している場合は Step 1-C で読み込んだ `search-patterns/[カテゴリ].md` のクエリを優先する。
+- Step 1-C で確定したフレーズをそのまま使う（**デフォルト 3 回**、最大 5 回）
+- 職種別の追加クエリは `search-patterns/[カテゴリ].md` を参照
+- 2024〜2026 年の情報を優先。GitHub スター数・X のいいね数を信頼性指標として活用
 
-**GitHub情報**
-- `{テーマ} github stars trending`
-- `{テーマ} awesome list github`
+### 画像 URL の収集
 
-**X（Twitter）情報**
-- `{テーマ} site:twitter.com OR site:x.com`
-- `{テーマ} tips tricks popular 2025`
+ビジュアル方針が「グラフ作成＋画像あり」のときのみ実行。`references/image-embedding.md` を参照。
 
-**技術ブログ・解説記事**
-- `{テーマ} best practices tutorial`
-- `{テーマ} 使い方 まとめ`
-
-### 収集の注意事項
-
-- 検索回数は **デフォルト3回**（Step 1-C で確定したフレーズをそのまま使う）
-- ユーザーがフレーズを追加した場合・テーマが広い場合は最大5回まで実施してよい
-- 2024〜2026年の情報を優先（技術トレンドの変化により、古い情報は価値が下がる可能性が高いため）
-- GitHubのスター数・フォーク数、Xのいいね数を信頼性指標として活用
-
-### 画像 URL の収集（「グラフ作成＋画像あり」選択時のみ）
-
-Step 1-C のビジュアル方針が「グラフ作成＋画像あり」の場合のみ実行する。
-「グラフ作成＋画像なし」「テキストのみ」の場合はスキップ。
-
-テキスト検索の完了後、**`image_search` ツールを1回実行**して画像候補を取得する。
-
-**手順**
-
-1. テーマに関連するクエリで `image_search` を1回呼ぶ（例：`VSCode extensions popular icons`）
-2. 返された画像 URL と出典ページ URL を `references/image-embedding.md` の判断基準でフィルタする
-3. 1スライドにつき **最大 1 件** を目安に候補を絞る
-4. 収集結果を以下の形式で**必ず出力する**（0件の場合も「なし」と明記する）：
+1. テーマ関連クエリで `image_search` を **1 回**だけ実行（`web_search` では画像 URL は取れない）
+2. 返された URL を `image-embedding.md` の判断基準でフィルタ
+3. 1 スライドにつき最大 1 件、結果を以下の形式で必ず出力（0 件でも「なし」と明記）：
 
 ```
 [画像収集リスト]
-スライド 3: 画像URL https://... / 出典ページ https://... / 説明「〇〇のスクリーンショット」
-スライド 5: 画像URL https://... / 出典ページ https://... / 説明「〇〇のロゴ」
+スライド 3: 画像URL ... / 出典ページ ... / 説明「...」
 スライド 4: なし（適切なURLが見つからなかったため）
 ```
 
-> **重要**: `web_search` はテキストスニペットのみを返す。画像 URL の取得には必ず `image_search` ツールを使うこと。
-> **会話のみモード（3枚ミニ含む）、および「グラフ作成＋画像なし」「テキストのみ」選択時は画像収集をスキップする。**
+### 数値データの抽出
 
-### 数値データの抽出（グラフ化判定の前段）
+ビジュアル方針が「テキストのみ」以外のとき実行。`chart-generation.md` の「データ抽出ルール」に従い、
+**数値・単位・出典・取得時点が揃った候補のみ** を「[グラフデータ候補]」形式で記録する。
+1 つでも欠ければ抽出しない（推測値の混入禁止）。
 
-> **スキップ条件**: ビジュアル方針が「テキストのみでOK」の場合はこのサブステップをスキップする。
-
-Step 2 の終わりに、収集情報から **数値比較・推移・構成比** が抽出できるかを評価する。
-1 つでも抽出できる場合は、Step 3-0 でグラフ化判定を行う。
-
-`references/chart-generation.md` の「データ抽出ルール」に従い、以下の形式で記録する：
-
-```
-[グラフデータ候補]
-種別:    bar-chart   （またはline / donut / scatter）
-タイトル: ...
-データ:
-  - ラベル1: 数値1
-  - ラベル2: 数値2
-  - ラベル3: 数値3
-単位:    ...
-出典:    ...（必須）
-出典URL: ...
-取得時点: YYYY-MM
-```
-
-> **会話のみモード（3枚ミニ含む）**: 出典なしでの数値はグラフ化に使えないため、原則として候補抽出をスキップする。
-> **「テキストのみでOK」選択時**: グラフ生成を行わないため、候補抽出をスキップする。
+> 会話のみモード（3 枚ミニ含む）は原則スキップ。会話内に出典まで明示されている場合のみ例外的に許可。
 
 ---
 
-## Step 3-0: グラフ化判定（数値テーマのみ）
+## Step 3-0: グラフ化判定
 
-> **スキップ条件**: ビジュアル方針が「テキストのみでOK」の場合、このステップ全体をスキップし Step 3 へ進む。
-
-Step 2 で「[グラフデータ候補]」が 1 つ以上記録された場合のみ実行する。
-記録がない場合（非数値テーマ・会話のみモードなど）はこのステップをスキップして Step 3 へ進む。
+> **スキップ条件**: ビジュアル方針が「テキストのみ」のとき、または「[グラフデータ候補]」が 0 件のとき。
 
 ### 手順
 
 1. `references/chart-generation.md` を読み込む
-2. 各候補について「グラフ化判断フロー」の **4 条件すべて YES** かを確認する：
-   - 数値性 / データ点数 3 点以上 / 単位・出典の明確性 / 種別判定可能性
-3. すべて YES の候補のみ「採用」とする。1 つでも NO があれば「不採用」(テキスト・表で代替）
-4. 採用された候補について、`references/chart-generation.md` の「データ形状 → グラフ種別マッピング」で **使用するテンプレート** を決定する：
-   - `assets/chart-templates/bar-chart.svg`（横棒）
-   - `assets/chart-templates/line-chart.svg`（折れ線）
-   - `assets/chart-templates/donut-chart.svg`（ドーナツ）
-   - `assets/chart-templates/scatter-plot.svg`（散布図）
-5. 採用結果を以下の形式で記録し、Step 3 に渡す：
+2. 各候補について 4 条件（数値性 / 3 点以上 / 単位・出典 / 種別判定可能性）を判定。**全 YES のみ採用**
+3. 採用候補は「データ形状 → グラフ種別マッピング」でテンプレートを決定（bar / line / donut / scatter）
+4. 採用結果を以下の形式で記録：
 
 ```
 [グラフ採用リスト]
 スライド N: テンプレート bar-chart.svg / タイトル「...」 / 系列 1 / データ点 5
 ```
 
-> **制約**: 1 スライドに含めるグラフは **最大 1 つ**。
-> 同一スライドに画像とグラフを共存させない（密度過多）。
+**制約**: 1 スライドあたりグラフは最大 1 つ。画像とグラフは同一スライドに共存させない。
 
 ---
 
 ## Step 3: スライド構成の設計
 
-収集した情報を整理し、スライド構成を決める。
-構成パターンとレイアウトの詳細は `references/slide-layouts.md` を参照すること。
-
-**構成モードの選択**
+`references/slide-layouts.md` を参照して構成を決める。
 
 | モード | 枚数 | 使用条件 |
 |--------|------|---------|
-| 通常モード | 6〜10枚 | Web検索あり・またはハイブリッドで情報量十分 |
-| 3枚ミニモード | 3枚固定 | 「会話のみ」かつ情報量不足でユーザーが「3枚でOK」を選択 |
+| 通常モード | 6〜10 枚 | Web検索あり、またはハイブリッドで情報量十分 |
+| 3枚ミニモード | 3 枚固定 | 「会話のみ」かつ情報量不足で「3 枚でOK」選択時 |
 
-**通常モードの構成フレーム（6〜10枚）**
-
-```
-Slide 1   : タイトル（テーマ・出典バッジ）
-Slide 2   : 概要・背景（数字・トレンドで裏付け）
-Slide 3〜N-2 : メインコンテンツ（テーマに応じて柔軟に設計）
-Slide N-1 : まとめ（3〜5つのキーポイント）
-Slide N   : 参考リンク・出典URL一覧
-```
-
-**3枚ミニモードの構成フレーム**
-
-`references/slide-layouts.md` の「3枚ミニスライド構成」セクションを参照すること。
+**通常モードの構成フレーム**
 
 ```
-Slide 1 : サマリ（タイトル ＋ 概要・背景を融合）
-Slide 2 : 本文（要点を1枚に凝縮、箇条書き主体）
-Slide 3 : まとめ（結論 ＋ 参考リンクを融合）
+Slide 1     : タイトル（テーマ・出典バッジ）
+Slide 2     : 概要・背景（数字・トレンドで裏付け）
+Slide 3〜N-2 : メインコンテンツ
+Slide N-1   : まとめ（3〜5 個のキーポイント）
+Slide N     : 参考リンク・出典 URL 一覧
 ```
 
-> **グラフ採用がある場合**: Step 3-0 で記録した「[グラフ採用リスト]」を参照し、
-> グラフを置くスライドを 1 枚決める（概要・背景 / メインコンテンツの中盤が適切）。
+**3 枚ミニモード**は `slide-layouts.md` の「3 枚ミニスライド構成」を参照（サマリ / 本文 / まとめ）。
+
+> グラフ採用がある場合、Step 3-0 のリストから配置スライドを 1 枚決める（概要・背景またはメインコンテンツ中盤が適切）。
 
 ---
 
@@ -326,133 +220,56 @@ Slide 3 : まとめ（結論 ＋ 参考リンクを融合）
 ### デザイン原則
 
 - フォント: Noto Sans JP（本文）+ JetBrains Mono（コード）
-- アクセントカラー: 1色のみ（`--accent` 変数で制御）
+- アクセントカラー 1 色のみ（`--accent`）
 - 文字中心・広い余白・箇条書き主体
-- スライドサイズ: **960px × 540px 固定（16:9）**、`transform: scale()` でフィット
+- スライドサイズ: 960×540px 固定（16:9）、`transform: scale()` でフィット
+- 詳細は `references/design-tokens.md`
 
-詳細なCSS変数・カラーパレット → `references/design-tokens.md` を参照。
+### エクスポート機能
 
-### エクスポート機能（Phase 3）
-
-生成 HTML は以下 3 種類のエクスポート機能を持つ。詳細は `references/export-recipes.md` を参照。
+生成 HTML は以下 3 種に対応。詳細は `references/export-recipes.md`。
 
 | 方式 | 起動 | 依存 | 自己完結性 |
 |------|------|------|-----------|
-| PDF（印刷ダイアログ） | `P` キー / 📥メニュー | 標準 `window.print()` | ◎ オフライン可 |
-| 単一 PNG | `Shift+S` / 📥メニュー | html2canvas（CDN 動的ロード） | △ ネット必須 |
-| 全スライド ZIP | `Shift+P` / 📥メニュー | html2canvas + JSZip（CDN 動的ロード） | △ ネット必須 |
+| PDF（印刷経由） | `P` キー / 📥メニュー | 標準 `window.print()` | ◎ オフライン可 |
+| 単一 PNG | `Shift+S` / 📥 | html2canvas（CDN 動的ロード） | △ ネット必須 |
+| 全スライド ZIP | `Shift+P` / 📥 | html2canvas + JSZip（CDN 動的ロード） | △ ネット必須 |
 
-**設計原則:** スライドの「閲覧」自体は完全自己完結（外部リソースなし）。
-エクスポート操作時のみ CDN を動的ロードする。
-ネット不通時でも PDF は標準 API のみで動作するため確実に使える。
-
-**hero / list 両モード対応:** `P` キー経由（`exportPDF()`）と `Ctrl+P` 直接押下のどちらでも、
-1 ページ = 1 スライドが成立するよう `print.css` の `@media print` 内で hero モードの
-opacity / position / transform をすべて上書きしている。
+閲覧は完全自己完結、エクスポート時のみ CDN を動的ロード。`P` キー経由でも `Ctrl+P` 直接でも 1 ページ = 1 スライドになるよう `print.css` が hero モードを上書きする。
 
 ### 生成手順
 
 1. `assets/base-template.html` をコピーして土台にする
-2. `assets/styles/` の **7 ファイル**を `<style>` に統合する（theme-vars → slide-core → nav-controls → figure → chart → list-view → **print** の順）
-   - `print.css` は必ず最後に統合する。`@media print` で他の CSS を上書きするため
-3. `references/slide-layouts.md` を参照しながら、各スライドのHTMLを `<section class="slide">` で記述する
-4. **画像埋め込み（ビジュアル方針が「グラフ作成＋画像あり」の場合のみ）** — `references/image-embedding.md` と `assets/fallback-image.html` を参照
+2. `assets/styles/` の **7 ファイル**を `<style>` に統合（`theme-vars → slide-core → nav-controls → figure → chart → list-view → print` の順、print.css は必ず最後）
+3. `references/slide-layouts.md` を参照し、各スライドを `<section class="slide">` で記述
+4. **画像埋め込み**（ビジュアル方針「グラフ作成＋画像あり」のときのみ）
+   - `references/image-embedding.md` の判断フローを実行
+   - 1 件でも埋め込む場合、`assets/fallback-image.html` の `createFallback()` を `<script>` の先頭にコピー
+   - 全 `<img>` に `onerror` でフォールバックを設定
+   - HTML パターンは `image-embedding.md` を参照
+5. **グラフ埋め込み**（Step 3-0 で採用されたときのみ）
+   - 「[グラフ採用リスト]」の対象スライドに、採用テンプレートの SVG をコピー
+   - プレースホルダー `{TITLE}` `{SOURCE}` データ値を実値に置換
+   - `<div class="slide-chart">` でラップして配置
+   - HTML パターンと座標計算は `chart-generation.md` を参照
+   - 制約: SVG はインライン展開のみ。色は `chart-series-N` / `chart-line-N` クラス経由（ハードコード禁止）。外部グラフライブラリ禁止
+6. `assets/scripts/` の **6 ファイル**を `<script>` に統合（`fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png` の順）
+7. `.control-cluster` 内に `.export-menu` ブロックが含まれることを確認（base-template に標準で含まれている）。キーボードショートカット（P / Shift+S / Shift+P）は navigation.js 改修版に組み込み済み
 
-    `references/image-embedding.md` の判断フローを実行する。
-
-    ```
-    Step 2 の「[画像収集リスト]」を確認
-    ↓
-    各候補について image-embedding.md の 1〜4 を順に判定
-    ↓
-    OK → <figure class="slide-figure"> で埋め込む
-    NG / なし → 画像埋め込みをスキップ（テキストのみ）
-    ```
-
-    埋め込む画像が1件でもある場合、`assets/fallback-image.html` を開いて
-    `createFallback()` 関数を `<script>` ブロックの先頭にコピーする（必須）。
-    全 `<img>` の `onerror` 属性にこの関数を設定する。
-
-    HTMLパターン例:
-    ```html
-    <figure class="slide-figure">
-      <img
-        src="https://example.com/image.png"
-        alt="VSCode 拡張機能 ABC のスクリーンショット"
-        onerror="this.parentElement.replaceWith(createFallback('https://example.com/page', 'ABC スクリーンショット'))"
-      >
-      <figcaption>
-        出典: <a href="https://example.com/page" target="_blank" rel="noopener">example.com</a>
-      </figcaption>
-    </figure>
-    ```
-
-5. **グラフ埋め込み（Step 3-0 で採用された場合のみ）** — `references/chart-generation.md` と `assets/chart-templates/*.svg` を参照
-
-    Step 3-0 の「[グラフ採用リスト]」を確認し、採用されたスライドにグラフを埋め込む。
-
-    ```
-    [グラフ採用リスト] を確認
-    ↓
-    採用テンプレート（bar / line / donut / scatter）の SVG ファイルをコピー
-    ↓
-    プレースホルダー {TITLE}, {SOURCE}, データ値などを実値に置換
-    ↓
-    <div class="slide-chart"> でラップしてスライドの本文領域に配置
-    ```
-
-    HTMLパターン例:
-    ```html
-    <section class="slide">
-      <h2>人気VSCode拡張機能 トップ5（DL数）</h2>
-      <div class="slide-chart">
-        <svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg" class="chart-svg">
-          <!-- bar-chart.svg の内容をコピーして値を埋める -->
-        </svg>
-      </div>
-    </section>
-    ```
-
-    > **重要**: SVG はインライン展開のみ。`<img src="*.svg">` は CSS 変数が効かないため不可。
-    > 色の指定はすべて `chart-series-N` / `chart-line-N` クラス経由で行い、`fill="#..."` のハードコードは禁止。
-    > **外部グラフライブラリ（Chart.js・D3.js 等）の使用は禁止**。`<script src="...Chart.js...">` の追加も禁止。
-    > グラフは `assets/chart-templates/*.svg` をコピーして値を埋めるだけで実装すること。
-
-6. `assets/scripts/` の **6 ファイル**を `<script>` に統合する
-   （fit-slide → theme-toggle → view-toggle → navigation → **export-pdf → export-png** の順）
-   - 統合順は依存関係で決まる:
-     - `navigation.js` は `currentView`（view-toggle.js）と `exportPDF/exportSinglePNG/exportAllPNG`（export-pdf/png.js）を参照
-     - キーボードハンドラは DOM 読込後に発火するため、宣言順より読み込み完了順が重要
-   - `navigation.js` の末尾で `update()` を呼び出すため、それより前に必要な関数定義がすべて完了していること
-
-7. **エクスポート機能の組み込み確認** — `references/export-recipes.md` を参照
-
-    `base-template.html` の `.control-cluster` 内に `.export-menu` ブロックが
-    含まれていることを確認する（最新の base-template には標準で含まれている）。
-
-    キーボードショートカット（P / Shift+S / Shift+P）は `navigation.js` の
-    Phase 3 改修版に組み込み済み。Ctrl/Cmd 同時押し時はブラウザ標準動作を尊重し、
-    入力フィールド上では無効化される。
-
-    PNG / ZIP エクスポートは初回呼び出し時に CDN から html2canvas / JSZip を
-    動的ロードする。失敗時は alert でユーザーに通知し、代替手段（PDF）を案内する。
-
-### 機能チェック
-
-生成後に以下が実装されていることを確認する。
+### 機能チェック表
 
 | 機能 | 実装方法 |
 |------|---------|
-| 16:9固定 + スケーリング | `.slide-scaler` + `fitSlide()` |
-| ライト/ダーク切替 | `[data-theme="dark"]` CSS変数 + `toggleTheme()` |
-| hero ⇄ list モード切替 | `[data-view="list"]` CSS + `toggleView()` |
+| 16:9 固定 + スケーリング | `.slide-scaler` + `fitSlide()` |
+| ライト/ダーク切替 | `[data-theme="dark"]` + `toggleTheme()` |
+| hero ⇄ list 切替 | `[data-view="list"]` + `toggleView()` |
 | 左右ナビ矢印 | `.nav-arrow` + `navigate()` |
 | プログレスバー・番号 | `#progress-bar` + `#slide-counter` |
 | PDF 印刷出力 | `exportPDF()` + `print.css` の `@media print` |
-| 単一 PNG 出力 | `exportSinglePNG()` + html2canvas 動的ロード |
-| 全スライド ZIP 出力 | `exportAllPNG()` + JSZip 動的ロード |
+| 単一 PNG 出力 | `exportSinglePNG()` + html2canvas |
+| 全 ZIP 出力 | `exportAllPNG()` + JSZip |
 | エクスポートメニュー | `.export-menu` + `toggleExportMenu()` |
-| キーボード操作 | `←→` 移動、`Space` 次へ、`F` フルスクリーン、`V` ビュー切替、`P` PDF、`Shift+S` PNG、`Shift+P` ZIP |
+| キーボード操作 | `←→` 移動 / `Space` 次へ / `F` フルスクリーン / `V` ビュー切替 / `P` PDF / `Shift+S` PNG / `Shift+P` ZIP |
 
 ---
 
@@ -466,43 +283,47 @@ opacity / position / transform をすべて上書きしている。
 
 ## クオリティチェックリスト
 
-出力前に確認する。
+出力前に以下の観点で確認する。
 
-- [ ] Web検索から得た実際の情報が含まれているか（架空のデータNG）
-- [ ] スライド枚数が 6〜10枚の範囲内か（通常モード）
-- [ ] 960×540px（16:9）固定サイズになっているか
-- [ ] ブラウザリサイズ時に `transform: scale()` でフィットするか
-- [ ] ライト／ダークテーマ切り替えが動作するか
-- [ ] ヒーロー／一覧モード切り替えがテーマトグルの右隣にあり動作するか
-- [ ] 一覧モードで縦スクロール表示になり、クリックでヒーローに戻るか
-- [ ] 左右ナビ矢印が最初・最後で非表示になるか
-- [ ] キーボードナビゲーション（←→ / Space / F / V）が動作するか
-- [ ] スライド番号・プログレスバーが正しく動作するか
-- [ ] 出典URLが参考リンクスライドに含まれているか
-- [ ] 画像を埋め込んだ場合、全画像に出典リンク（figcaption）が明記されているか
-- [ ] 画像の `onerror` フォールバック（`createFallback()`）が `<script>` に含まれているか
-- [ ] 会話のみモード（3枚ミニ含む）で画像収集・埋め込みが実行されていないか
-- [ ] ビジュアル方針（グラフ＋画像 / グラフのみ / テキストのみ）がユーザーに確認されているか
-- [ ] 「グラフ作成＋画像なし」「テキストのみ」選択時に画像収集・埋め込みが実行されていないか
-- [ ] 「テキストのみ」選択時にグラフ化判定・グラフ埋め込みが実行されていないか
+### A. フロー遵守
+- [ ] 情報ソース（会話のみ / ハイブリッド / Web検索メイン）がユーザーに確認されたか
+- [ ] 検索する場合、検索フレーズ候補がユーザーに提示・承認されたか
+- [ ] ビジュアル方針（グラフ＋画像 / グラフのみ / テキストのみ）が確認されたか
+- [ ] 情報量不足・中止選択時に検索や HTML 生成が一切行われていないか
+
+### B. コンテンツ品質
+- [ ] Web検索から得た実際の情報が含まれているか（架空データ NG）
+- [ ] 出典 URL が参考リンクスライドに含まれているか
+- [ ] スライド枚数が選択モードに合致しているか（通常 6〜10 枚 / ミニ 3 枚固定）
+
+### C. レイアウト・テーマ
+- [ ] 960×540px（16:9）固定で `transform: scale()` フィットが動作するか
+- [ ] ライト／ダーク切替が動作するか
+- [ ] hero／list 切替が動作し、list でクリックすると hero に戻るか
 - [ ] 日本語フォントが正しく読み込まれているか
-- [ ] 情報ソース（会話のみ / ハイブリッド / Web検索メイン）がユーザーに確認されているか
-- [ ] 検索する場合、検索フレーズ候補3〜5個がユーザーに提示・承認されているか
-- [ ] 3枚ミニモード時、スライド枚数が厳密に3枚になっているか
-- [ ] 情報量不足・中止選択時、検索やHTML生成が実行されていないか
-- [ ] グラフを埋め込んだ場合、軸ラベル（X 軸・Y 軸）と出典が SVG 内に明記されているか
-- [ ] グラフ内の色が `var(--chart-N)` / `var(--accent)` 経由で指定され、ライト・ダーク両モードで読みやすいか
-- [ ] グラフ内に数値ラベルとグラフ要素（バー・線・セクター）の両方が存在するか（片方だけは NG）
-- [ ] 非数値テーマ・会話のみモード・「テキストのみ」選択時で、グラフが過剰生成されていないか
-- [ ] 同一スライドに画像とグラフが共存していないか（密度過多防止）
-- [ ] 1 スライドあたりのグラフが最大 1 つに収まっているか
-- [ ] Chart.js・D3.js 等の外部グラフライブラリが使われていないか（`<canvas>`・CDN script 禁止）
-- [ ] グラフのすべての色指定が `chart-series-N` / `chart-line-N` クラス経由か（`fill="#..."` のハードコードなし）
-- [ ] エクスポートメニュー（📥）がコントロールクラスタの右端に表示されているか
-- [ ] P キーで印刷ダイアログが開き、PDF として保存できるか
-- [ ] PDF が 1 スライド = 1 ページで出力されるか（hero モード起点でも崩れないか）
-- [ ] Shift+S で現在スライドの PNG（slide-NN.png）がダウンロードできるか
-- [ ] Shift+P で全スライドの ZIP（slides.zip）がダウンロードできるか
-- [ ] 外部画像の CORS エラー / ネット切断時に alert でエラー通知が表示されるか
-- [ ] 印刷時にダークテーマが強制ライトに上書きされるか
-- [ ] 印刷時にコントロール類・ナビ矢印・プログレスバーが非表示になるか
+
+### D. ナビゲーション
+- [ ] 左右ナビ矢印が最初・最後で非表示になるか
+- [ ] スライド番号・プログレスバーが正しく動作するか
+- [ ] キーボードナビゲーション（←→ / Space / F / V）が動作するか
+
+### E. 画像
+- [ ] 全画像に出典リンク（figcaption）が明記されているか
+- [ ] `createFallback()` が `<script>` に含まれ、全 `<img>` の `onerror` に設定されているか
+- [ ] 「画像なし」「テキストのみ」「会話のみ」選択時に画像が埋め込まれていないか
+
+### F. グラフ
+- [ ] グラフに軸ラベル（X / Y）と出典が SVG 内に明記されているか
+- [ ] 色が `var(--chart-N)` / `var(--accent)` 経由でライト・ダーク両対応か（`fill="#..."` ハードコード禁止）
+- [ ] 数値ラベルとグラフ要素（バー・線・セクター）の両方が存在するか
+- [ ] 1 スライドあたりグラフ最大 1 つ、画像とグラフは同一スライドに共存していないか
+- [ ] 「テキストのみ」「会話のみ」選択時にグラフが生成されていないか
+- [ ] Chart.js・D3.js 等の外部ライブラリ・`<canvas>`・CDN script を使用していないか
+
+### G. エクスポート
+- [ ] 📥メニューがコントロールクラスタの右端に表示されるか
+- [ ] `P` で印刷ダイアログが開き、1 ページ = 1 スライドで PDF 保存できるか（hero 起点でも崩れないか）
+- [ ] `Shift+S` で現在スライドの PNG がダウンロードできるか
+- [ ] `Shift+P` で全スライド ZIP がダウンロードできるか
+- [ ] CORS エラー / ネット切断時に alert でエラー通知が出るか
+- [ ] 印刷時にダークテーマがライトに上書きされ、コントロール類が非表示になるか

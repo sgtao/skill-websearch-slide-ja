@@ -16,6 +16,7 @@ description: >
 ## ワークフロー概要
 
 ```
+0.   スライド作成の確認（Yes / No）
 1-A. 情報ソース確認（会話のみ / ハイブリッド / Web検索メイン）
 1-B. テーマ・ロール確認
 1-C. 検索フレーズ提案＋ビジュアル方針確認
@@ -23,7 +24,7 @@ description: >
 3-0. グラフ化判定
 3.   スライド構成の設計
 4.   HTMLスライド生成（エクスポート機能込み）
-5.   ファイル出力・提示（＋検証フロー）
+5.   ファイル出力・提示・検証
 ```
 
 ## 参照ファイルガイド
@@ -43,7 +44,7 @@ description: >
 | `references/image-embedding.md` | Step 2 画像収集、Step 4 画像埋め込み |
 | `references/chart-generation.md` | Step 3-0 グラフ化判定、Step 4 グラフ埋め込み |
 | `references/export-recipes.md` | Step 4：エクスポート機能（PDF/PNG/ZIP）組み込み |
-| `references/output-validation.md` | Step 5：ユーザーが品質検証を求めた場合 |
+| `references/output-validation.md` | Step 5：品質検証・修正確認 |
 | `assets/base-template.html` | Step 4 開始時に必ずコピーして土台にする |
 | `assets/styles/*.css` | 全 7 ファイルを統合（theme-vars → slide-core → nav-controls → figure → chart → list-view → print） |
 | `assets/scripts/*.js` | 全 6 ファイルを統合（fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png） |
@@ -59,6 +60,22 @@ description: >
 | Web検索あり × グラフ作成＋画像なし | スキップ | 実行 | 実行 |
 | Web検索あり × テキストのみ | スキップ | スキップ | スキップ |
 | 会話のみモード（3枚ミニ含む） | スキップ | 原則スキップ | 原則スキップ |
+
+---
+
+## Step 0: スライド作成の確認
+
+スキルが呼び出された時点で、最初に `ask_user_input_v0` で作成意思を確認する。
+
+```
+質問: HTMLベースのスライド資料を作成しますか？
+選択肢:
+  - 「はい、作成する」
+  - 「いいえ、やめる」
+```
+
+- **「はい、作成する」** → Step 1-A へ進む
+- **「いいえ、やめる」** → 「了解しました。」と回答してスキルの処理を終了する（検索・生成は一切行わない）
 
 ---
 
@@ -277,22 +294,41 @@ Slide N     : 参考リンク・出典 URL 一覧
 
 ---
 
-## Step 5: 出力
+## Step 5: 出力・検証
+
+### 5-A. ファイル出力
 
 - ファイル名: `{テーマ}-slides.html`
 - 保存先: `/mnt/user-data/outputs/`
 - `present_files` で提示
 
-### 検証フロー（Phase 5）
+### 5-B. 品質検証（Phase 5）
 
 ユーザーが「品質を確認して」「検証して」「チェックして」と求めた場合、
-`references/output-validation.md` を参照して以下を実行する：
-
-1. `bash scripts/validate-output.sh {出力ファイル}` を実行
-2. FAIL がある場合は該当箇所を修正して再生成
-3. PASS の場合はユーザーに結果を報告
-
+`references/output-validation.md` を参照して以下のフローを実行する。
 検証は**ユーザーの明示的な要求時のみ**実行する（デフォルトでは実行しない）。
+
+**検証フロー:**
+
+1. `bash scripts/validate-output.sh {出力ファイル}` を実行する
+2. 結果を確認する：
+
+**ALL PASS の場合:**
+- 「検証完了: 全チェック項目を PASS しました。」とユーザーに報告して終了
+
+**FAIL がある場合:**
+- FAIL 項目をわかりやすく整理してユーザーに提示する（どのカテゴリで何が FAIL したか）
+- `ask_user_input_v0` で修正意思を確認する：
+
+```
+質問: チェック結果に問題がありました。修正しますか？
+選択肢:
+  - 「はい、修正する」
+  - 「いいえ、このままでOK」
+```
+
+- **「はい、修正する」** → FAIL 箇所を修正して HTML を再生成し、再度 `validate-output.sh` を実行する。ALL PASS になるまで繰り返す
+- **「いいえ、このままでOK」** → 「了解しました。」と回答する。ファイルが未提示なら `present_files` で提示、提示済みなら回答のみで終了
 
 ---
 
@@ -301,6 +337,7 @@ Slide N     : 参考リンク・出典 URL 一覧
 出力前に以下の観点で確認する。
 
 ### A. フロー遵守
+- [ ] Step 0 でスライド作成の意思が確認されたか
 - [ ] 情報ソース（会話のみ / ハイブリッド / Web検索メイン）がユーザーに確認されたか
 - [ ] 検索する場合、検索フレーズ候補がユーザーに提示・承認されたか
 - [ ] ビジュアル方針（グラフ＋画像 / グラフのみ / テキストのみ）が確認されたか

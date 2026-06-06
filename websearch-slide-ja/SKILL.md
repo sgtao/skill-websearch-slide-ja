@@ -23,7 +23,7 @@ description: >
 3-0. グラフ化判定
 3.   スライド構成の設計
 4.   HTMLスライド生成（エクスポート機能込み）
-5.   ファイル出力・提示
+5.   ファイル出力・提示（＋検証フロー）
 ```
 
 ## 参照ファイルガイド
@@ -43,11 +43,13 @@ description: >
 | `references/image-embedding.md` | Step 2 画像収集、Step 4 画像埋め込み |
 | `references/chart-generation.md` | Step 3-0 グラフ化判定、Step 4 グラフ埋め込み |
 | `references/export-recipes.md` | Step 4：エクスポート機能（PDF/PNG/ZIP）組み込み |
+| `references/output-validation.md` | Step 5：ユーザーが品質検証を求めた場合 |
 | `assets/base-template.html` | Step 4 開始時に必ずコピーして土台にする |
 | `assets/styles/*.css` | 全 7 ファイルを統合（theme-vars → slide-core → nav-controls → figure → chart → list-view → print） |
 | `assets/scripts/*.js` | 全 6 ファイルを統合（fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png） |
 | `assets/fallback-image.html` | 画像埋め込み時に `createFallback()` をコピー |
 | `assets/chart-templates/*.svg` | グラフ埋め込み時に該当テンプレートをコピー |
+| `scripts/validate-output.sh` | Step 5：生成 HTML の機械的チェック |
 
 ## ステップ別スキップ条件（早見表）
 
@@ -242,6 +244,7 @@ Slide N     : 参考リンク・出典 URL 一覧
 1. `assets/base-template.html` をコピーして土台にする
 2. `assets/styles/` の **7 ファイル**を `<style>` に統合（`theme-vars → slide-core → nav-controls → figure → chart → list-view → print` の順、print.css は必ず最後）
 3. `references/slide-layouts.md` を参照し、各スライドを `<section class="slide">` で記述
+   - 10 行超のテーブル・20 項目超の一覧を含むスライドには `class="slide slide-fit"` を付与
 4. **画像埋め込み**（ビジュアル方針「グラフ作成＋画像あり」のときのみ）
    - `references/image-embedding.md` の判断フローを実行
    - 1 件でも埋め込む場合、`assets/fallback-image.html` の `createFallback()` を `<script>` の先頭にコピー
@@ -269,6 +272,7 @@ Slide N     : 参考リンク・出典 URL 一覧
 | 単一 PNG 出力 | `exportSinglePNG()` + html2canvas |
 | 全 ZIP 出力 | `exportAllPNG()` + JSZip |
 | エクスポートメニュー | `.export-menu` + `toggleExportMenu()` |
+| 一覧テーブル高さ可変 | `.slide-fit` + `list-view.css` + `print.css` |
 | キーボード操作 | `←→` 移動 / `Space` 次へ / `F` フルスクリーン / `V` ビュー切替 / `P` PDF / `Shift+S` PNG / `Shift+P` ZIP |
 
 ---
@@ -278,6 +282,17 @@ Slide N     : 参考リンク・出典 URL 一覧
 - ファイル名: `{テーマ}-slides.html`
 - 保存先: `/mnt/user-data/outputs/`
 - `present_files` で提示
+
+### 検証フロー（Phase 5）
+
+ユーザーが「品質を確認して」「検証して」「チェックして」と求めた場合、
+`references/output-validation.md` を参照して以下を実行する：
+
+1. `bash scripts/validate-output.sh {出力ファイル}` を実行
+2. FAIL がある場合は該当箇所を修正して再生成
+3. PASS の場合はユーザーに結果を報告
+
+検証は**ユーザーの明示的な要求時のみ**実行する（デフォルトでは実行しない）。
 
 ---
 
@@ -327,3 +342,12 @@ Slide N     : 参考リンク・出典 URL 一覧
 - [ ] `Shift+P` で全スライド ZIP がダウンロードできるか
 - [ ] CORS エラー / ネット切断時に alert でエラー通知が出るか
 - [ ] 印刷時にダークテーマがライトに上書きされ、コントロール類が非表示になるか
+
+### H. コンテンツ漏洩チェック（Phase 5 追加）
+- [ ] `<section>` / `<div class="slide-inner">` の直下に CSS 定義テキスト（`[data-theme="dark"]`、`var(--`、`:root {` 等）が表示されていないか
+- [ ] JavaScript コード断片（`function `、`const `、`document.`）がスライドの可視テキストとして漏れていないか
+- [ ] SVG テンプレートのプレースホルダー（`{TITLE}`、`{SOURCE}`、`{AXIS_X_LABEL}` 等）が未置換のまま残っていないか
+
+### I. オーバーフロー対策（Phase 5 追加）
+- [ ] 10 行超のテーブルや 20 項目超の一覧を含むスライドに `slide-fit` クラスが付与されているか
+- [ ] `slide-fit` が通常の概要・メインコンテンツスライドに誤って付与されていないか

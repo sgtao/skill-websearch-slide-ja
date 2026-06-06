@@ -10,6 +10,7 @@
  *   2. 印刷時はライトテーマ強制（インク節約・コントラスト確保）。
  *   3. コントロール類・ナビ矢印・プログレスバーは非表示。
  *   4. 用紙サイズは 16:9（1280×720px）固定、余白ゼロでスライドを全面表示。
+ *   5. .slide-fit スライドは印刷時も高さ可変（Phase 5 追加）。
  */
 
 /* ==========================================================================
@@ -146,6 +147,25 @@ body.exporting-pdf .slide {
     .slide:hover {
         transform: none !important;
         box-shadow: none !important;
+    }
+
+    /* ─── 2-6b. slide-fit：印刷時も高さ可変（Phase 5 追加） ─── */
+    /* 一覧テーブル等の長いコンテンツを持つスライドは、
+       印刷時にも高さを可変にして全件を出力する。
+       page-break-inside: avoid を解除し、ページ跨ぎを許容する。 */
+    .slide.slide-fit,
+    body[data-view="list"] .slide.slide-fit {
+        height: auto !important;
+        min-height: 720px;
+        overflow: visible !important;
+        page-break-inside: auto;
+        break-inside: auto;
+    }
+
+    .slide.slide-fit .slide-inner,
+    body[data-view="list"] .slide.slide-fit .slide-inner {
+        height: auto !important;
+        min-height: 720px;
     }
 
     /* ─── 2-7. 内部コンテンツ：1280×720 にスケールアップ ─── */

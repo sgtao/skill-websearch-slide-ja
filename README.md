@@ -1,4 +1,4 @@
-# websearch-slide-ja
+# skill-websearch-slide-ja
 
 Web検索で情報収集して、スライド形式のHTMLページを生成するClaude.aiスキル。
 

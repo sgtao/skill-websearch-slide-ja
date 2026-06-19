@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI支援ツール導入の提案 | 開発生産性 | Slides</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+/* ===== theme-vars.css ===== */
+/* theme-vars.css
+ * ライト/ダークテーマのCSS変数定義。
+ * slide-core.css より前に読み込む（変数の先行定義が必要）。
+ */
+
+:root {
+  --bg-body:        #F0F2F5;
+  --bg-slide:       #FFFFFF;
+  --bg-surface:     #F8F9FA;
+  --text-primary:   #1A1A1A;
+  --text-secondary: #6B7280;
+  --accent:         #2563EB;
+  --accent-light:   #EFF6FF;
+  --accent-dim:     #DBEAFE;
+  --border:         #E5E7EB;
+  --nav-bg:         rgba(0,0,0,0.6);
+  --nav-text:       #FFFFFF;
+  --progress-track: rgba(255,255,255,0.2);
+
+  /* ─── チャート系列色（ライト） ───
+   * --chart-1 は --accent と一致させ、単系列グラフでアクセントと揃える。
+   * 2〜5 系列は Tailwind 系の調和色を採用。
+   */
+  --chart-1:     var(--accent);
+  --chart-2:     #10B981;
+  --chart-3:     #F59E0B;
+  --chart-4:     #EF4444;
+  --chart-5:     #8B5CF6;
+  --chart-grid:  var(--border);
+  --chart-label: var(--text-secondary);
+}
+
+[data-theme="dark"] {
+  --bg-body:        #0D1117;
+  --bg-slide:       #161B22;
+  --bg-surface:     #21262D;
+  --text-primary:   #E6EDF3;
+  --text-secondary: #8B949E;
+  --accent:         #58A6FF;
+  --accent-light:   #1C2D3F;
+  --accent-dim:     #1F3A57;
+  --border:         #30363D;
+  --nav-bg:         rgba(255,255,255,0.1);
+  --nav-text:       #E6EDF3;
+  --progress-track: rgba(255,255,255,0.1);
+
+  /* ─── チャート系列色（ダーク） ───
+   * GitHub Primer 系の彩度を抑えた色を採用。
+   * --accent (#58A6FF) との調和を優先。
+   */
+  --chart-1:     var(--accent);
+  --chart-2:     #3FB950;
+  --chart-3:     #D29922;
+  --chart-4:     #F85149;
+  --chart-5:     #A371F7;
+  --chart-grid:  var(--border);
+  --chart-label: var(--text-secondary);
+}
+
+/* ===== slide-core.css ===== */
+/* slide-core.css
+ * 16:9固定サイズのスライドビューポートと、
+ * hero モード時のスケーリング・レイアウト。
+ * theme-vars.css の読み込み後に適用すること。
+ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-body);
+  color: var(--text-primary);
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+/* ─── スケーラー（hero時: 絶対中央配置） ─── */
+.slide-scaler {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* JS: transform: translate(-50%, -50%) scale(ratio) */
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+  width: 960px;
+  height: 540px;
+}
+
+/* ─── スライド本体（960×540px 固定） ─── */
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 960px;
+  height: 540px;
+  background: var(--bg-slide);
+  border-radius: 8px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ─── スライド内コンテンツラッパ ─── */
+/* list時にJS側でscale変換するためのラッパ。hero時はそのまま表示。 */
+.slide-inner {
+  width: 100%;
+  height: 100%;
+  padding: 52px 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* ===== nav-controls.css ===== */
+/* nav-controls.css
+ * 右上コントロールクラスタ（テーマ・ビュー切替・エクスポートボタン）、
+ * 左右ナビ矢印、プログレスバー、スライド番号。
+ *
+ * Phase 3 改修:
+ *   - .export-menu (ドロップダウンの親コンテナ) を追加
+ *   - .export-dropdown (ドロップダウン本体) を追加
+ *   - .kbd (キーボードショートカット表示) を追加
+ */
+
+/* ─── 右上コントロールクラスタ ─── */
+.control-cluster {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+}
+
+.control-cluster button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: var(--nav-bg);
+  color: var(--nav-text);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.control-cluster button:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+[data-theme="dark"] .control-cluster button:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ─── エクスポートメニュー（Phase 3 追加） ─── */
+/* .control-cluster 内の他のボタンと同じ形状を保ちつつ、
+   ドロップダウンメニューを抱える親コンテナ。 */
+.export-menu {
+  position: relative;
+  display: inline-block;
+}
+
+/* ─── エクスポートドロップダウン（Phase 3 追加） ─── */
+/* #export-toggle ボタンの下に表示されるメニューパネル。
+   hidden 属性で開閉する。 */
+.export-dropdown {
+  position: absolute;
+  top: 44px; /* control-cluster のボタン高さ 36px + gap 8px */
+  right: 0;
+  background: var(--bg-slide);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  padding: 6px;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 150;
+}
+
+.export-dropdown[hidden] {
+  display: none;
+}
+
+/* ─── ドロップダウン内のボタン（Phase 3 追加） ─── */
+/* control-cluster の他のボタンとは異なるスタイル（横長・左寄せテキスト）。
+   !important は使わず、より具体的なセレクタで上書きする。 */
+.control-cluster .export-dropdown button {
+  width: 100%;
+  height: auto;
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  transition: background 0.15s;
+}
+
+.control-cluster .export-dropdown button:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+[data-theme="dark"] .control-cluster .export-dropdown button:hover {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+/* ─── キーボードショートカット表示（Phase 3 追加） ─── */
+/* ドロップダウン内のボタン右端に表示される [P] [Shift+S] などの小バッジ。 */
+.export-dropdown .kbd {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.control-cluster .export-dropdown button:hover .kbd {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ─── 左右ナビ矢印 ─── */
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 80px;
+  background: var(--nav-bg);
+  color: var(--nav-text);
+  border: none;
+  border-radius: 4px;
+  font-size: 32px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-arrow:hover { opacity: 0.85; }
+.nav-arrow.nav-prev { left: 8px; }
+.nav-arrow.nav-next { right: 8px; }
+.nav-arrow[hidden]  { display: none; }
+
+/* ─── プログレスバー（最上部） ─── */
+#progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+  z-index: 200;
+}
+
+/* ─── スライド番号（右下） ─── */
+#slide-counter {
+  position: absolute;
+  bottom: 16px;
+  right: 20px;
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-secondary);
+  z-index: 10;
+}
+
+/* ===== figure.css ===== */
+/* figure.css
+ * スライド内の画像フィギュア（.slide-figure）スタイル。
+ * slide-core.css の読み込み後、list-view.css の前に統合する。
+ * Step 4 の CSS 統合順: theme-vars → slide-core → nav-controls → figure → list-view
+ */
+
+/* ─── フィギュアコンテナ ─── */
+.slide-figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+}
+
+/* ─── 画像本体 ─── */
+.slide-figure img {
+    max-width: 100%;
+    max-height: 200px;
+    /* スライド高さ 540px に対して余白を確保 */
+    object-fit: contain;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
+    display: block;
+}
+
+/* ─── 出典キャプション ─── */
+.slide-figure figcaption {
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.4;
+}
+
+.slide-figure figcaption a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.slide-figure figcaption a:hover {
+    text-decoration: underline;
+}
+
+/* ─── フォールバックプレースホルダー ─── */
+.slide-figure-fallback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    max-height: 200px;
+    min-height: 80px;
+    border-radius: 6px;
+    border: 1px dashed var(--border);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    padding: 12px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.slide-figure-fallback .fallback-icon {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.slide-figure-fallback a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.7rem;
+}
+
+/* ─── 画像右配置（リスト系スライドとの併用） ─── */
+.slide-with-figure {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.slide-with-figure .slide-figure {
+    width: 220px;
+    flex-shrink: 0;
+}
+/* ===== chart.css ===== */
+/* chart.css
+ * SVG グラフ要素のスタイル。
+ * Step 4 の CSS 統合順: theme-vars → slide-core → nav-controls → figure → chart → list-view
+ *
+ * 設計原則:
+ *   1. 色のハードコード禁止。すべて theme-vars.css の --chart-* を参照する。
+ *   2. SVG はインライン展開のみ（<img src="*.svg"> 不可）。CSS 変数を効かせるため。
+ *   3. font-family は継承（本文の Noto Sans JP を引き継ぐ）。
+ */
+
+/* ─── チャートコンテナ ─── */
+.slide-chart {
+    width: 100%;
+    max-height: 320px;
+    display: block;
+    margin: 0 auto;
+}
+
+.chart-svg {
+    width: 100%;
+    height: auto;
+    max-height: 320px;
+    overflow: visible;
+    display: block;
+}
+
+/* ─── 系列色クラス（塗り：バー・ドーナツ・散布図点） ─── */
+.chart-series-1 { fill: var(--chart-1); }
+.chart-series-2 { fill: var(--chart-2); }
+.chart-series-3 { fill: var(--chart-3); }
+.chart-series-4 { fill: var(--chart-4); }
+.chart-series-5 { fill: var(--chart-5); }
+
+/* ─── 系列色クラス（線：折れ線） ─── */
+.chart-line-1 { stroke: var(--chart-1); fill: none; stroke-width: 2.5; }
+.chart-line-2 { stroke: var(--chart-2); fill: none; stroke-width: 2.5; }
+.chart-line-3 { stroke: var(--chart-3); fill: none; stroke-width: 2.5; }
+.chart-line-4 { stroke: var(--chart-4); fill: none; stroke-width: 2.5; }
+.chart-line-5 { stroke: var(--chart-5); fill: none; stroke-width: 2.5; }
+
+/* ─── 軸・グリッド ─── */
+.chart-axis {
+    stroke: var(--chart-grid);
+    stroke-width: 1;
+    fill: none;
+}
+
+.chart-grid-line {
+    stroke: var(--chart-grid);
+    stroke-width: 1;
+    stroke-dasharray: 2 3;
+    fill: none;
+}
+
+/* ─── ラベル・テキスト ─── */
+.chart-label {
+    fill: var(--chart-label);
+    font-size: 11px;
+    font-family: inherit;
+}
+
+.chart-axis-label {
+    fill: var(--text-secondary);
+    font-size: 10px;
+    font-family: inherit;
+}
+
+.chart-value {
+    fill: var(--text-primary);
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+}
+
+.chart-title {
+    fill: var(--text-primary);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+}
+
+/* ─── 凡例 ─── */
+.chart-legend {
+    fill: var(--text-secondary);
+    font-size: 10px;
+    font-family: inherit;
+}
+
+/* ─── 出典 ─── */
+.chart-source {
+    fill: var(--text-secondary);
+    font-size: 9px;
+    font-family: inherit;
+    font-style: italic;
+}
+
+/* ─── ドット（折れ線頂点・散布図点） ─── */
+.chart-dot {
+    stroke: var(--bg-slide);
+    stroke-width: 1.5;
+}
+
+/* ===== list-view.css ===== */
+/* list-view.css
+ * 一覧表示モード（body[data-view="list"]）のスタイル。
+ * hero モードのスタイルを上書きするため、!important を多用している。
+ * slide-core.css の後に読み込むこと。
+ */
+
+/* ─── html・body: スクロール有効化 ─── */
+/* hero時は overflow:hidden のため、両方に !important で上書きが必要 */
+html[data-view="list"],
+body[data-view="list"] {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  min-height: 100vh;
+}
+
+/* ─── スケーラー: 縦並びフレックスに変換 ─── */
+body[data-view="list"] .slide-scaler {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: 100%;
+  height: auto;
+  transform: none !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: 72px 5vw 64px;
+}
+
+/* ─── スライド枠: レスポンシブ幅 + 16:9比率維持 ─── */
+body[data-view="list"] .slide {
+  position: relative;
+  inset: auto;
+  width: min(90vw, 960px);
+  height: auto;
+  aspect-ratio: 16 / 9;
+  padding: 0 !important;
+  overflow: hidden;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+body[data-view="list"] .slide:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 70px rgba(0,0,0,0.4);
+}
+
+/* ─── 内部コンテンツラッパ: 960×540px 固定 + scale変換 ─── */
+/* JS側で slide.clientWidth / 960 を ratio として scale() を設定する */
+body[data-view="list"] .slide-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 960px;
+  height: 540px;
+  padding: 52px 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transform-origin: top left;
+  box-sizing: border-box;
+}
+
+/* ─── スライド番号バッジ（右上） ─── */
+body[data-view="list"] .slide::after {
+  content: attr(data-num);
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  padding: 3px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  z-index: 5;
+}
+
+/* ─── ナビ矢印・カウンター・プログレスバーを非表示 ─── */
+body[data-view="list"] .nav-arrow,
+body[data-view="list"] #slide-counter,
+body[data-view="list"] #progress-bar {
+  display: none;
+}
+
+/* ─── チャート: list モードでもスライド枠からはみ出さないようにする ─── */
+/* .chart-svg は overflow:visible だが、親 .slide-chart で抑制する */
+body[data-view="list"] .slide-inner .slide-chart {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+ * 高さ可変スライド — .slide-fit（Phase 5 追加）
+ * ==========================================================================
+ *
+ * 一覧テーブル・長いリストなど、960×540px に収まらないコンテンツ用。
+ * hero モードでは通常の 960×540 固定を維持（下部は非表示）。
+ * list モードでのみ高さをコンテンツに追従させる。
+ *
+ * 使い方: <section class="slide slide-fit" id="sN">
+ *
+ * 注意:
+ *   - hero モードの slide-core.css は変更不要（height:540px + overflow:hidden が防御）
+ *   - このクラスは「参照用の一覧表」に限定し、メインコンテンツには使わない
+ *   - print.css の @media print でも同様の高さ可変が必要なため、
+ *     print.css 側にも .slide-fit 対応ルールを追加すること
+ * ========================================================================== */
+
+/* ─── スライド枠: aspect-ratio を解除して高さ可変に ─── */
+body[data-view="list"] .slide.slide-fit {
+  height: fit-content;
+  aspect-ratio: auto;
+  min-height: 200px;
+  overflow: visible;
+}
+
+/* ─── 内部コンテンツラッパ: absolute → relative に変更 ─── */
+/* 通常スライドは absolute + scale() で 960×540 を縮小表示するが、
+   slide-fit では relative + 親幅追従にしてコンテンツ全体を表示する。
+   scaleListSlides() の transform: scale() も無効化する。 */
+body[data-view="list"] .slide.slide-fit .slide-inner {
+  position: relative;
+  width: 100%;
+  height: auto;
+  min-height: 200px;
+  transform: none !important;
+  /* padding は通常スライドと同じ値を維持 */
+  padding: 32px 48px;
+}
+
+/* ─── slide-fit 内のテーブル: 横スクロール対応 ─── */
+/* テーブル幅がスライド幅を超える場合にも対応 */
+body[data-view="list"] .slide.slide-fit table {
+  width: 100%;
+  font-size: 0.82rem;
+  border-collapse: collapse;
+}
+
+body[data-view="list"] .slide.slide-fit td,
+body[data-view="list"] .slide.slide-fit th {
+  padding: 4px 8px;
+}
+
+/* ===== print.css ===== */
+/* print.css
+ * 印刷・PDF エクスポート用スタイル。
+ * Step 4 の CSS 統合順: theme-vars → slide-core → nav-controls → figure → chart → list-view → print
+ * （必ず最後に読み込む。他の CSS を @media print で上書きするため）
+ *
+ * 設計原則:
+ *   1. hero / list どちらのモードから印刷しても 1 ページ = 1 スライドになる。
+ *      → @media print 内で hero モードの opacity/position/transform をすべて上書き。
+ *      → exportPDF() 経由でも Ctrl+P 直接押下でも同じ結果になる「二重防御」。
+ *   2. 印刷時はライトテーマ強制（インク節約・コントラスト確保）。
+ *   3. コントロール類・ナビ矢印・プログレスバーは非表示。
+ *   4. 用紙サイズは 16:9（1280×720px）固定、余白ゼロでスライドを全面表示。
+ *   5. .slide-fit スライドは印刷時も高さ可変（Phase 5 追加）。
+ */
+
+/* ==========================================================================
+ * 1. 画面表示時のエクスポート準備状態
+ *    exportPDF() が body に .exporting-pdf を付与する。
+ *    Ctrl+P 直接押下ルートでは付与されないため、@media print 側でも保険を入れる。
+ * ========================================================================== */
+body.exporting-pdf .slide {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* ==========================================================================
+ * 2. 印刷時のスタイル（@media print）
+ *    Ctrl+P 直接押下ルートでも 1 ページ = 1 スライドが成立するよう、
+ *    hero モードの CSS をここですべて上書きする。
+ * ========================================================================== */
+@media print {
+
+    /* ─── 2-1. ライトテーマ強制（CSS 変数の上書き） ─── */
+    /* :root と [data-theme="dark"] の両方を上書きする必要がある。
+       [data-theme="dark"] の方が特異度が高いため明示的に再定義。 */
+    :root,
+    [data-theme="dark"] {
+        --bg-body:        #FFFFFF;
+        --bg-slide:       #FFFFFF;
+        --bg-surface:     #F8F9FA;
+        --text-primary:   #000000;
+        --text-secondary: #4B5563;
+        --accent:         #2563EB;
+        --accent-light:   #EFF6FF;
+        --accent-dim:     #DBEAFE;
+        --border:         #D1D5DB;
+        /* チャート系列色はライトテーマの値を維持 */
+        --chart-1:        var(--accent);
+        --chart-2:        #10B981;
+        --chart-3:        #F59E0B;
+        --chart-4:        #EF4444;
+        --chart-5:        #8B5CF6;
+        --chart-grid:     var(--border);
+        --chart-label:    var(--text-secondary);
+    }
+
+    /* ─── 2-2. ページ設定（1280×720 landscape、余白ゼロ） ─── */
+    @page {
+        size: 1280px 720px landscape;
+        margin: 0;
+    }
+
+    /* ─── 2-3. html / body のスクロール制御を解除 ─── */
+    /* hero モード時の overflow: hidden、list モード時の overflow: auto を
+       どちらも visible に戻し、印刷エンジンに任せる。 */
+    html,
+    body,
+    html[data-view="list"],
+    body[data-view="list"] {
+        overflow: visible !important;
+        height: auto !important;
+        min-height: 0 !important;
+        background: #FFFFFF !important;
+    }
+
+    /* ─── 2-4. 非表示要素 ─── */
+    /* インタラクション系の UI は印刷物に含めない。 */
+    .control-cluster,
+    .export-menu,
+    .export-dropdown,
+    .nav-arrow,
+    #progress-bar,
+    #slide-counter {
+        display: none !important;
+    }
+
+    /* list モードのスライド番号バッジも非表示 */
+    body[data-view="list"] .slide::after {
+        display: none !important;
+    }
+
+    /* ─── 2-5. スケーラーを通常配置に戻す ─── */
+    /* hero モードの position: fixed + transform: scale() と、
+       list モードの flex 縦並びの両方を解除し、
+       単純な block 要素として印刷フローに乗せる。 */
+    .slide-scaler {
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        width: auto !important;
+        height: auto !important;
+        display: block !important;
+        padding: 0 !important;
+        gap: 0 !important;
+    }
+
+    /* ─── 2-6. スライド本体：1 ページ = 1 スライド ─── */
+    /* hero モードの absolute 配置・opacity: 0 を完全に解除し、
+       list モードの aspect-ratio・min/max width も解除する。 */
+    .slide,
+    body[data-view="list"] .slide {
+        position: relative !important;
+        inset: auto !important;
+        top: auto !important;
+        left: auto !important;
+        width: 1280px !important;
+        height: 720px !important;
+        max-width: none !important;
+        aspect-ratio: auto !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        cursor: default !important;
+        background: var(--bg-slide) !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        transform: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        flex-shrink: 0 !important;
+
+        /* 1 スライド = 1 ページの強制 */
+        page-break-after: always;
+        break-after: page;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    /* 最終スライドの後ろに空白ページを作らない */
+    .slide:last-child {
+        page-break-after: auto;
+        break-after: auto;
+    }
+
+    /* hover トランジションを切る（印刷で意味がない） */
+    .slide:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    /* ─── 2-6b. slide-fit：印刷時も高さ可変（Phase 5 追加） ─── */
+    /* 一覧テーブル等の長いコンテンツを持つスライドは、
+       印刷時にも高さを可変にして全件を出力する。
+       page-break-inside: avoid を解除し、ページ跨ぎを許容する。 */
+    .slide.slide-fit,
+    body[data-view="list"] .slide.slide-fit {
+        height: auto !important;
+        min-height: 720px;
+        overflow: visible !important;
+        page-break-inside: auto;
+        break-inside: auto;
+    }
+
+    .slide.slide-fit .slide-inner,
+    body[data-view="list"] .slide.slide-fit .slide-inner {
+        height: auto !important;
+        min-height: 720px;
+    }
+
+    /* ─── 2-7. 内部コンテンツ：1280×720 にスケールアップ ─── */
+    /* 元の 960×540 から 1280×720 への拡大は transform でなく padding 調整で吸収。
+       transform: scale() を使うと印刷時に位置ずれが起きやすいため避ける。 */
+    .slide-inner,
+    body[data-view="list"] .slide-inner {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        width: 1280px !important;
+        height: 720px !important;
+        padding: 70px 96px !important;
+        transform: none !important;
+        transform-origin: top left !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+
+    /* ─── 2-8. テキストの可読性確保 ─── */
+    /* リンク色を保持（PDF でクリック可能にするブラウザもある） */
+    a {
+        color: var(--accent) !important;
+        text-decoration: underline !important;
+    }
+
+    /* ─── 2-9. 画像・グラフのサイズ調整 ─── */
+    /* 印刷時は高さ制約を緩めて画質を担保 */
+    .slide-figure img {
+        max-height: 280px !important;
+    }
+    .slide-figure-fallback {
+        max-height: 280px !important;
+    }
+    .slide-chart {
+        max-height: 440px !important;
+    }
+    .chart-svg {
+        max-height: 440px !important;
+    }
+
+    /* ─── 2-10. 色の印刷を強制（重要） ─── */
+    /* ブラウザのデフォルトは「背景色・画像を印刷しない」設定の場合があるため、
+       全要素で color-adjust を exact に。アクセントカラーやチャートが
+       白黒にならないよう保証する。 */
+    *,
+    *::before,
+    *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+}
+
+/* ===== per-deck content styles (business pitch) ===== */
+.slide-inner.top { justify-content: flex-start; padding-top: 48px; }
+
+/* title */
+.eyebrow { font-size: .82rem; font-weight: 700; color: var(--accent); letter-spacing: .1em; margin-bottom: 1.1rem; }
+h1 { font-size: 2.4rem; font-weight: 700; line-height: 1.25; letter-spacing: .01em; }
+h1 .accent { color: var(--accent); }
+.subtitle { margin-top: 1.1rem; font-size: 1.05rem; color: var(--text-secondary); line-height: 1.6; }
+.badges { margin-top: 1.7rem; display: flex; gap: .6rem; flex-wrap: wrap; }
+.badge { font-size: .8rem; font-weight: 500; padding: .38em .85em; border-radius: 999px; background: var(--accent-dim); color: var(--accent); }
+.title-meta { margin-top: 1.8rem; font-size: .8rem; color: var(--text-secondary); line-height: 1.6; }
+
+/* heading */
+.slide-title { font-size: 1.55rem; font-weight: 700; line-height: 1.3; }
+.slide-divider { width: 56px; height: 4px; border-radius: 2px; background: var(--accent); margin: .7rem 0 1.2rem; }
+
+/* lead */
+.lead { font-size: 1.02rem; line-height: 1.85; color: var(--text-primary); }
+.lead strong { color: var(--accent); }
+
+/* points */
+ul.points { list-style: none; }
+ul.points li { position: relative; padding: .4em 0 .4em 1.4em; font-size: 1.0rem; line-height: 1.55; }
+ul.points li::before { content: ""; position: absolute; left: 0; top: .9em; width: .5em; height: .5em; border-radius: 50%; background: var(--accent); }
+ul.points li strong { color: var(--accent); }
+ul.points li .sub { display: block; font-size: .82rem; color: var(--text-secondary); margin-top: .15em; line-height: 1.5; }
+
+/* cards */
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: .3rem; }
+.cards.two { grid-template-columns: repeat(2, 1fr); }
+.card { background: var(--bg-surface); border: 1px solid var(--border); border-top: 3px solid var(--accent); border-radius: 8px; padding: 1rem 1.1rem; }
+.card .card-no { font-size: .78rem; font-weight: 700; color: var(--accent); letter-spacing: .03em; }
+.card h3 { font-size: 1.0rem; font-weight: 700; margin: .35rem 0 .5rem; line-height: 1.35; }
+.card p { font-size: .82rem; color: var(--text-secondary); line-height: 1.6; }
+
+/* stat cards */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; margin-top: .3rem; }
+.stat { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.2rem; }
+.stat .stat-num { font-size: 2.0rem; font-weight: 700; color: var(--accent); line-height: 1.1; }
+.stat .stat-unit { font-size: 1rem; font-weight: 700; color: var(--accent); margin-left: .1em; }
+.stat .stat-label { font-size: .8rem; color: var(--text-secondary); margin-top: .55rem; line-height: 1.5; }
+
+/* two column (risk vs mitigation) */
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 1.3rem; margin-top: .3rem; }
+.twocol h4 { font-size: .95rem; font-weight: 700; margin-bottom: .4rem; }
+.twocol .col-risk h4 { color: var(--text-primary); }
+.twocol .col-fix h4 { color: var(--accent); }
+
+/* summary numbered */
+.summary-list { list-style: none; counter-reset: s; }
+.summary-list li { counter-increment: s; position: relative; padding: .5em 0 .5em 2.3em; font-size: 1.0rem; line-height: 1.5; }
+.summary-list li::before { content: counter(s); position: absolute; left: 0; top: .4em; width: 1.55em; height: 1.55em; background: var(--accent-dim); color: var(--accent); border-radius: 50%; font-size: .82rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+/* callout (the ask) */
+.callout { background: var(--accent-light); border: 1px solid var(--accent-dim); border-left: 4px solid var(--accent); border-radius: 8px; padding: 1rem 1.2rem; margin-top: .4rem; }
+.callout strong { color: var(--accent); }
+
+/* links */
+ul.links { list-style: none; }
+ul.links li { padding: .4em 0; font-size: .88rem; line-height: 1.45; }
+ul.links li a { color: var(--accent); text-decoration: none; word-break: break-all; }
+ul.links li a:hover { text-decoration: underline; }
+ul.links li .src-label { color: var(--text-primary); font-weight: 500; }
+
+/* note */
+.note { margin-top: 1rem; font-size: .72rem; color: var(--text-secondary); line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+  <div class="control-cluster">
+    <button id="theme-toggle" onclick="toggleTheme()" title="テーマ切替（クリック）">
+      <span id="theme-icon">🌙</span>
+    </button>
+    <button id="view-toggle" onclick="toggleView()" title="表示切替（V）">☰</button>
+    <div class="export-menu">
+      <button id="export-toggle" onclick="toggleExportMenu()" title="エクスポート">📥</button>
+      <div id="export-dropdown" class="export-dropdown" hidden role="menu">
+        <button type="button" role="menuitem" onclick="exportPDF(); closeExportMenu();">📄 PDFとして印刷 <span class="kbd">P</span></button>
+        <button type="button" role="menuitem" onclick="exportSinglePNG(); closeExportMenu();">🖼️ このスライドをPNG <span class="kbd">Shift+S</span></button>
+        <button type="button" role="menuitem" onclick="exportAllPNG(); closeExportMenu();">📦 全スライドをZIP <span class="kbd">Shift+P</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="progress-bar"></div>
+
+  <div class="slide-scaler">
+    <button class="nav-arrow nav-prev" id="btn-prev" onclick="navigate(-1)">&#8249;</button>
+    <button class="nav-arrow nav-next" id="btn-next" onclick="navigate(1)">&#8250;</button>
+
+    <!-- ========== Slide 1: タイトル ========== -->
+    <section class="slide active" id="s1">
+      <div class="slide-inner">
+        <div class="eyebrow">投資提案 ― 開発生産性</div>
+        <h1>AI支援ツール導入で、<span class="accent">開発を速く・楽しく。</span></h1>
+        <p class="subtitle">AIコーディング支援ツールの段階導入提案 ― 実測データに基づく投資判断のために</p>
+        <div class="badges">
+          <span class="badge">課題 → 施策 → 効果</span>
+          <span class="badge">実測データ・出典付き</span>
+          <span class="badge">PoC方式</span>
+        </div>
+        <div class="title-meta">対象：意思決定層（経営・PM・EM）／数値は公開研究・調査に基づく実測値です。</div>
+      </div>
+    </section>
+
+    <!-- ========== Slide 2: エグゼクティブサマリー ========== -->
+    <section class="slide" id="s2">
+      <div class="slide-inner top">
+        <div class="slide-title">エグゼクティブサマリー</div>
+        <div class="slide-divider"></div>
+        <p class="lead">開発者の時間は、反復作業・情報探索に多く費やされている。AIコーディング支援ツールは、この時間を<strong>本質的な設計・課題解決へ振り向ける</strong>。実測では大幅な高速化が確認されており、低リスクな<strong>PoC方式</strong>での導入を提案する。</p>
+        <ul class="points" style="margin-top:1.1rem;">
+          <li>実測でタスク完了が<strong>55%高速化</strong>（成功率も70%→78%）</li>
+          <li>導入は業界標準化（開発者の<strong>84%</strong>がAIツールを利用／利用予定）</li>
+          <li>まずは小さく試す ― PoC → 効果測定 → 段階展開</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ========== Slide 3: 課題 ========== -->
+    <section class="slide" id="s3">
+      <div class="slide-inner top">
+        <div class="slide-title">課題：時間が「本質的でない作業」に流れている</div>
+        <div class="slide-divider"></div>
+        <ul class="points">
+          <li>定型コード・構文調べ・情報探索が、開発時間の少なくない部分を占める<span class="sub">本来注力すべき設計・アーキテクチャ・課題解決の時間が圧迫されている</span></li>
+          <li>レビュー待ち・PRサイクルの長さがリードタイムを伸ばす<span class="sub">開発者体験（DX）の低下は採用・定着にも影響する</span></li>
+          <li>競合・業界は既にAI活用が標準化しつつあり、着手の遅れは相対的な後退になる</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ========== Slide 4: なぜ今か ========== -->
+    <section class="slide" id="s4">
+      <div class="slide-inner top">
+        <div class="slide-title">なぜ今か：AI活用はすでに標準化</div>
+        <div class="slide-divider"></div>
+        <div class="stats">
+          <div class="stat"><div class="stat-num">84<span class="stat-unit">%</span></div><div class="stat-label">開発者がAIツールを利用／利用予定（2025年・前年は76%）</div></div>
+          <div class="stat"><div class="stat-num">51<span class="stat-unit">%</span></div><div class="stat-label">プロ開発者が「毎日」AIツールを使用（2025年）</div></div>
+          <div class="stat"><div class="stat-num">90<span class="stat-unit">%</span></div><div class="stat-label">Fortune 100企業での採用率（パイロットから標準基盤へ）</div></div>
+        </div>
+        <p class="note">出典: Stack Overflow Developer Survey（2024→2025）ほか。AI開発ツールは試験導入から標準インフラへ移行している。</p>
+      </div>
+    </section>
+
+    <!-- ========== Slide 5: 施策 ========== -->
+    <section class="slide" id="s5">
+      <div class="slide-inner top">
+        <div class="slide-title">施策：AIコーディング支援ツールの段階導入</div>
+        <div class="slide-divider"></div>
+        <div class="cards">
+          <div class="card"><div class="card-no">施策 1</div><h3>対象チームでPoC</h3><p>1〜2チームに限定して試験導入。既存ワークフローに統合し、実コードで効果を測る。</p></div>
+          <div class="card"><div class="card-no">施策 2</div><h3>効果をKPIで測定</h3><p>完了時間・PRサイクル・成功率・満足度（SPACE観点）をビフォーアフターで定量化。</p></div>
+          <div class="card"><div class="card-no">施策 3</div><h3>ガードレール整備</h3><p>レビュー必須・機密の取り扱い・品質ゲートを定義し、安全に展開できる土台を作る。</p></div>
+        </div>
+        <p class="note">小さく始めて事実で判断する。効果が確認できた範囲から段階的に全社展開する。</p>
+      </div>
+    </section>
+
+    <!-- ========== Slide 6: 効果① 実測KPI ========== -->
+    <section class="slide" id="s6">
+      <div class="slide-inner top">
+        <div class="slide-title">効果①：実測で示された生産性</div>
+        <div class="slide-divider"></div>
+        <div class="stats">
+          <div class="stat"><div class="stat-num">55<span class="stat-unit">%</span></div><div class="stat-label">タスク完了が高速化（71分 vs 161分）</div></div>
+          <div class="stat"><div class="stat-num">78<span class="stat-unit">%</span></div><div class="stat-label">タスク成功率（未使用は70%）</div></div>
+          <div class="stat"><div class="stat-num">2.4<span class="stat-unit">日</span></div><div class="stat-label">PRサイクル（導入前9.6日／約75%短縮）</div></div>
+        </div>
+        <p class="note">出典: GitHub の管理実験（SPACE）および GitHub × Accenture の調査。高速化の源泉は定型処理・構文調べの削減で、品質は同等。</p>
+      </div>
+    </section>
+
+    <!-- ========== Slide 7: 効果② グラフ（実感%） ========== -->
+    <section class="slide" id="s7">
+      <div class="slide-inner top">
+        <div class="slide-title">効果②：開発者自身が変化を実感</div>
+        <div class="slide-divider"></div>
+        <div class="slide-chart">
+          <svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg" class="chart-svg">
+            <text x="40" y="28" class="chart-title">AI支援ツール利用者の実感（開発者2,000人調査）</text>
+            <line x1="180" y1="50" x2="180" y2="290" class="chart-axis" />
+            <line x1="180" y1="290" x2="680" y2="290" class="chart-axis" />
+            <text x="430" y="320" class="chart-axis-label" text-anchor="middle">「そう感じる」と答えた割合（％）</text>
+
+            <text x="170" y="78" class="chart-label" text-anchor="end">生産性が上がった</text>
+            <rect x="180" y="64" width="480" height="22" class="chart-series-1" />
+            <text x="666" y="80" class="chart-value">88%</text>
+
+            <text x="170" y="118" class="chart-label" text-anchor="end">反復作業の負荷減</text>
+            <rect x="180" y="104" width="475" height="22" class="chart-series-1" />
+            <text x="661" y="120" class="chart-value">87%</text>
+
+            <text x="170" y="158" class="chart-label" text-anchor="end">情報探索の時間減</text>
+            <rect x="180" y="144" width="420" height="22" class="chart-series-1" />
+            <text x="606" y="160" class="chart-value">77%</text>
+
+            <text x="170" y="198" class="chart-label" text-anchor="end">満足な仕事に集中</text>
+            <rect x="180" y="184" width="404" height="22" class="chart-series-1" />
+            <text x="590" y="200" class="chart-value">74%</text>
+
+            <text x="680" y="350" class="chart-source" text-anchor="end">出典: GitHub 開発者調査（2,000人超・SPACE）</text>
+          </svg>
+        </div>
+        <p class="note">速度だけでなく、認知負荷の軽減とやりがいの向上にもつながっている。</p>
+      </div>
+    </section>
+
+    <!-- ========== Slide 8: リスクと留意点 ========== -->
+    <section class="slide" id="s8">
+      <div class="slide-inner top">
+        <div class="slide-title">リスクと留意点（フェアに見る）</div>
+        <div class="slide-divider"></div>
+        <div class="twocol">
+          <div class="col-risk">
+            <h4>指摘されているリスク</h4>
+            <ul class="points">
+              <li>効果実感まで時間がかかる<span class="sub">一部研究では本格的な効果まで約11週</span></li>
+              <li>検証コスト・バグ混入の懸念<span class="sub">生成コードの検証に時間が移る場合がある</span></li>
+              <li>効果は職種・タスクで差が出る</li>
+            </ul>
+          </div>
+          <div class="col-fix">
+            <h4>提案する打ち手</h4>
+            <ul class="points">
+              <li>PoCを11週以上の十分な期間で設計</li>
+              <li>レビュー必須・品質ゲートを標準化</li>
+              <li>定型作業中心の領域から優先導入</li>
+            </ul>
+          </div>
+        </div>
+        <p class="note">効果を疑う研究も存在する。だからこそ「小さく試して測る」ことが意思決定の前提になる。</p>
+      </div>
+    </section>
+
+    <!-- ========== Slide 9: 実行計画＋依頼 ========== -->
+    <section class="slide" id="s9">
+      <div class="slide-inner top">
+        <div class="slide-title">実行計画と、お願いしたいこと</div>
+        <div class="slide-divider"></div>
+        <ul class="summary-list">
+          <li><strong>第1四半期</strong>：対象チーム選定・KPI定義・ツール選定とガードレール整備</li>
+          <li><strong>PoC期間</strong>：11週以上の試験導入、ビフォーアフターで効果測定</li>
+          <li><strong>評価</strong>：完了時間・PRサイクル・品質・満足度をレビューし、展開可否を判断</li>
+        </ul>
+        <div class="callout">
+          <strong>意思決定のお願い：</strong> PoC（対象1〜2チーム・約3か月）の<strong>予算と実施承認</strong>をお願いします。効果は数値で報告し、展開は事実に基づき段階判断します。
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== Slide 10: 参考リンク・出典 ========== -->
+    <section class="slide" id="s10">
+      <div class="slide-inner top">
+        <div class="slide-title">参考リンク・出典</div>
+        <div class="slide-divider"></div>
+        <ul class="links">
+          <li><span class="src-label">GitHub 公式リサーチ（55%高速化・SPACE）：</span> <a href="https://github.blog/news-insights/research/research-quantifying-github-copilots-impact-on-developer-productivity-and-happiness/" target="_blank" rel="noopener">github.blog（research: Copilot productivity）</a></li>
+          <li><span class="src-label">GitHub × Accenture 等の統計（PRサイクル他）：</span> <a href="https://www.quantumrun.com/consulting/github-copilot-statistics/" target="_blank" rel="noopener">quantumrun.com（GitHub Copilot statistics 2026）</a></li>
+          <li><span class="src-label">採用率・実感（SO 2025・2,000人調査）：</span> <a href="https://www.docker.com/blog/ai-productivity-divide-developers-5x-faster/" target="_blank" rel="noopener">docker.com（AI productivity divide）</a></li>
+          <li><span class="src-label">開発者の実感（学術まとめ）：</span> <a href="https://arxiv.org/pdf/2502.13199" target="_blank" rel="noopener">arxiv.org/pdf/2502.13199</a></li>
+          <li><span class="src-label">反証研究（バランス確認）：</span> <a href="https://visualstudiomagazine.com/articles/2024/09/17/another-report-weighs-in-on-github-copilot-dev-productivity.aspx" target="_blank" rel="noopener">visualstudiomagazine.com（counter-evidence）</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <div id="slide-counter">1 / 10</div>
+  </div><!-- /.slide-scaler -->
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const total  = slides.length;
+    let cur = 0;
+
+    function createFallback(sourceUrl, altText) {
+      const div = document.createElement('div');
+      div.className = 'slide-figure-fallback';
+      const icon = document.createElement('span');
+      icon.className = 'fallback-icon';
+      icon.textContent = '🖼️';
+      const msg = document.createElement('span');
+      msg.textContent = '画像を読み込めませんでした';
+      const caption = document.createElement('figcaption');
+      if (sourceUrl) {
+        const link = document.createElement('a');
+        link.href = sourceUrl; link.target = '_blank'; link.rel = 'noopener';
+        try { link.textContent = '出典: ' + (new URL(sourceUrl).hostname); }
+        catch (e) { link.textContent = '出典リンク'; }
+        caption.appendChild(link);
+      }
+      div.appendChild(icon); div.appendChild(msg);
+      const figure = document.createElement('figure');
+      figure.className = 'slide-figure';
+      figure.appendChild(div);
+      if (sourceUrl) figure.appendChild(caption);
+      return figure;
+    }
+
+    /* ===== fit-slide.js ===== */
+/* fit-slide.js
+ * hero モード時に .slide-scaler をブラウザウィンドウに合わせてスケーリングする。
+ * window.resize イベントで再計算し、初期表示時にも即時実行する。
+ */
+
+function fitSlide() {
+  const scaler = document.querySelector('.slide-scaler');
+  if (!scaler) return;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const ratio = Math.min(vw / 960, vh / 540) * 0.92;
+  scaler.style.transform = `translate(-50%, -50%) scale(${ratio})`;
+}
+
+window.addEventListener('resize', () => {
+  if (currentView === 'hero') fitSlide();
+});
+
+fitSlide();
+
+    /* ===== theme-toggle.js ===== */
+/* theme-toggle.js
+ * ライト/ダークテーマの切り替えと、localStorage による状態の永続化。
+ */
+
+function toggleTheme() {
+  const isDark = document.documentElement.dataset.theme === 'dark';
+  document.documentElement.dataset.theme = isDark ? 'light' : 'dark';
+  document.getElementById('theme-icon').textContent = isDark ? '🌙' : '☀️';
+  try { localStorage.setItem('slide-theme', isDark ? 'light' : 'dark'); } catch(e) {}
+}
+
+// 初期化：保存済みテーマを復元
+(function initTheme() {
+  try {
+    const saved = localStorage.getItem('slide-theme');
+    if (saved) {
+      document.documentElement.dataset.theme = saved;
+      document.getElementById('theme-icon').textContent = saved === 'dark' ? '☀️' : '🌙';
+    }
+  } catch(e) {}
+})();
+
+    /* ===== view-toggle.js ===== */
+/* view-toggle.js
+ * hero モードと list モードの切り替え。
+ * hero: 1スライドずつ中央表示（デフォルト）
+ * list: 全スライドを縦スクロールで表示、クリックで hero に戻る
+ *
+ * 依存: fit-slide.js (fitSlide), navigation.js (cur, update)
+ */
+
+let currentView = 'hero'; // 'hero' | 'list'
+
+function toggleView() {
+  currentView = (currentView === 'hero') ? 'list' : 'hero';
+  applyView();
+  try { localStorage.setItem('slide-view', currentView); } catch(e) {}
+}
+
+function applyView() {
+  // html と body の両方に data-view を設定（overflow制御のため）
+  document.documentElement.dataset.view = currentView;
+  document.body.dataset.view = currentView;
+  document.getElementById('view-toggle').textContent = (currentView === 'hero') ? '☰' : '▭';
+
+  if (currentView === 'hero') {
+    fitSlide();
+  } else {
+    scaleListSlides();
+  }
+}
+
+/* 一覧モード時の内部コンテンツスケーリング */
+function scaleListSlides() {
+  // DOMレイアウト確定後に clientWidth を取得（aspect-ratio の計算待ち）
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.slide').forEach(slide => {
+      const inner = slide.querySelector('.slide-inner');
+      if (!inner) return;
+      const ratio = slide.clientWidth / 960;
+      inner.style.transform = `scale(${ratio})`;
+    });
+  });
+}
+
+window.addEventListener('resize', () => {
+  if (currentView === 'list') scaleListSlides();
+});
+
+// 一覧モード: クリックでヒーローに戻り、そのスライドを表示
+document.querySelectorAll('.slide').forEach((slide, i) => {
+  slide.dataset.num = `${i + 1} / ${document.querySelectorAll('.slide').length}`;
+  slide.addEventListener('click', () => {
+    if (currentView !== 'list') return;
+    cur = i;
+    currentView = 'hero';
+    applyView();
+    update(); // navigation.js の update() を呼ぶ
+  });
+});
+
+// 初期化：保存済みビューを復元
+(function initView() {
+  try {
+    const saved = localStorage.getItem('slide-view');
+    if (saved === 'list') { currentView = 'list'; applyView(); }
+  } catch(e) {}
+})();
+
+    /* ===== navigation.js ===== */
+/* navigation.js
+ * スライドのナビゲーション（左右移動・矢印・キーボード・フルスクリーン）。
+ * slides / total / cur は base-template.html の <script> 冒頭で宣言すること。
+ *
+ * 依存:
+ *   - view-toggle.js (currentView, toggleView)
+ *   - export-pdf.js  (exportPDF)             ※ Phase 3
+ *   - export-png.js  (exportSinglePNG, exportAllPNG) ※ Phase 3
+ *
+ * Phase 3 改修:
+ *   - キーボードショートカットに P / Shift+S / Shift+P を追加
+ *   - Ctrl+Shift+P（DevTools コマンドパレット）との衝突を回避
+ */
+
+function navigate(dir) {
+  if (currentView === 'list') return; // 一覧モード中は無効
+  slides[cur].classList.remove('active');
+  cur = Math.max(0, Math.min(total - 1, cur + dir));
+  slides[cur].classList.add('active');
+  update();
+}
+
+function update() {
+  // プログレスバー
+  const bar = document.getElementById('progress-bar');
+  if (bar) bar.style.width = ((cur + 1) / total * 100) + '%';
+  // スライド番号
+  const counter = document.getElementById('slide-counter');
+  if (counter) counter.textContent = `${cur + 1} / ${total}`;
+  updateArrows();
+}
+
+function updateArrows() {
+  const prev = document.getElementById('btn-prev');
+  const next = document.getElementById('btn-next');
+  if (prev) prev.hidden = (cur === 0);
+  if (next) next.hidden = (cur === total - 1);
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+/* ==========================================================================
+ * キーボードショートカット
+ * ==========================================================================
+ * 既存:
+ *   ← / Space → 次へ
+ *   ←         → 前へ
+ *   F         → フルスクリーン切替
+ *   V         → ビュー切替（hero ⇄ list）
+ *
+ * Phase 3 追加:
+ *   P         → PDF 印刷ダイアログ起動（exportPDF）
+ *   Shift+S   → 現在スライドの PNG ダウンロード（exportSinglePNG）
+ *   Shift+P   → 全スライドの ZIP ダウンロード（exportAllPNG）
+ *
+ * 注意:
+ *   - Ctrl/Cmd 同時押しは除外（ブラウザ標準の Ctrl+P / Ctrl+Shift+P を奪わない）
+ *   - 入力中（input/textarea/contenteditable）は無視
+ * ========================================================================== */
+document.addEventListener('keydown', e => {
+  // 入力フィールドではショートカットを無効化
+  const t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) {
+    return;
+  }
+
+  // Ctrl / Cmd 押下時はブラウザ標準動作を尊重（ショートカット全停止）
+  if (e.ctrlKey || e.metaKey) return;
+
+  // ─── 既存のショートカット ───
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); navigate(1); return; }
+  if (e.key === 'ArrowLeft')                    { e.preventDefault(); navigate(-1); return; }
+  if (e.key === 'f' || e.key === 'F')           { toggleFullscreen(); return; }
+  if (e.key === 'v' || e.key === 'V')           { toggleView(); return; }
+
+  // ─── Phase 3: エクスポート系ショートカット ───
+  // Shift 系を先に判定する（Shift+P の e.key は 'P'、単独 P の e.key は 'p'）
+
+  // Shift+P → 全スライド ZIP
+  if (e.shiftKey && e.key === 'P') {
+    e.preventDefault();
+    if (typeof exportAllPNG === 'function') exportAllPNG();
+    return;
+  }
+
+  // Shift+S → 現在スライド PNG
+  if (e.shiftKey && (e.key === 'S' || e.key === 's')) {
+    e.preventDefault();
+    if (typeof exportSinglePNG === 'function') exportSinglePNG();
+    return;
+  }
+
+  // P 単独 → PDF 印刷
+  if (!e.shiftKey && (e.key === 'p' || e.key === 'P')) {
+    e.preventDefault();
+    if (typeof exportPDF === 'function') exportPDF();
+    return;
+  }
+});
+
+// 初期状態を適用
+update();
+
+    /* ===== export-pdf.js ===== */
+/* export-pdf.js
+ * PDF エクスポート: window.print() による印刷ダイアログ起動。
+ * エクスポートメニュー（ドロップダウン）のトグル制御もここに含める。
+ *
+ * 依存:
+ *   - print.css       : @media print の定義（1ページ=1スライド）
+ *   - view-toggle.js  : currentView / applyView()
+ *
+ * Step 4 の JS 統合順: fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png
+ *
+ * 設計原則:
+ *   1. hero モードから印刷した場合、一時的に list モードへ切り替えて全スライドを可視化する。
+ *      print.css 側でも hero モードの opacity/position を上書きしているため二重防御になる。
+ *   2. afterprint で .exporting-pdf クラスを除去するが、currentView は元に戻さない。
+ *      ユーザーが手動で V キー切替できるため、状態の自動復元による副作用を避ける。
+ *   3. メニュートグルは単純な hidden 属性の付け外しのみ。アニメーションは入れない。
+ */
+
+/* ==========================================================================
+ * 1. PDF エクスポート（メイン関数）
+ * ========================================================================== */
+
+/**
+ * PDF エクスポートを開始する。
+ * ブラウザの印刷ダイアログが起動し、ユーザーが「PDF として保存」を選ぶことで PDF 化できる。
+ */
+function exportPDF() {
+    // 1. body にエクスポート準備クラスを付与
+    //    print.css 側で .exporting-pdf .slide { opacity: 1; pointer-events: auto; } を効かせる
+    document.body.classList.add("exporting-pdf");
+
+    // 2. hero モードなら list モードへ一時切替（全スライドを DOM 可視化）
+    //    print.css 側でも opacity/position を上書きしているが、保険として list 化する
+    if (typeof currentView !== "undefined" && currentView === "hero") {
+        currentView = "list";
+        if (typeof applyView === "function") applyView();
+    }
+
+    // 3. レイアウト確定を 2 フレーム待ってから print() を呼ぶ
+    //    1 回だけだと aspect-ratio の計算前に印刷ダイアログが開く場合がある
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            window.print();
+        });
+    });
+}
+
+/* ==========================================================================
+ * 2. afterprint イベント: 後始末
+ * ========================================================================== */
+
+/**
+ * 印刷ダイアログを閉じた後、body のエクスポート準備クラスを除去する。
+ * currentView は元に戻さない（ユーザーの手動操作で十分）。
+ *
+ * 注: Ctrl+P 直接押下ルートでは exportPDF() を経由しないため
+ *     .exporting-pdf クラスは付かないが、afterprint は発火する。
+ *     classList.remove() は対象が無くてもエラーにならないので問題ない。
+ */
+window.addEventListener("afterprint", () => {
+    document.body.classList.remove("exporting-pdf");
+});
+
+/* ==========================================================================
+ * 3. エクスポートメニュー（ドロップダウン）のトグル制御
+ * ========================================================================== */
+
+/**
+ * エクスポートメニューを開閉する。
+ * #export-dropdown の hidden 属性をトグルするだけのシンプルな実装。
+ */
+function toggleExportMenu() {
+    const dropdown = document.getElementById("export-dropdown");
+    if (dropdown) dropdown.toggleAttribute("hidden");
+}
+
+/**
+ * エクスポートメニューを強制的に閉じる。
+ * メニュー内のボタンをクリックした後の自動クローズに使う。
+ */
+function closeExportMenu() {
+    const dropdown = document.getElementById("export-dropdown");
+    if (dropdown) dropdown.setAttribute("hidden", "");
+}
+
+/* ==========================================================================
+ * 4. 外側クリックでメニューを閉じる
+ * ========================================================================== */
+
+/**
+ * .export-menu の外側をクリックしたらメニューを閉じる。
+ * メニュー自身や内部ボタンへのクリックでは閉じない（onclick で個別にクローズ）。
+ */
+document.addEventListener("click", (e) => {
+    // closest('.export-menu') が null = メニュー外をクリック
+    if (!e.target.closest(".export-menu")) {
+        closeExportMenu();
+    }
+});
+
+/* ==========================================================================
+ * 5. Escape キーでメニューを閉じる
+ * ========================================================================== */
+
+/**
+ * メニューが開いている状態で Escape キーが押されたら閉じる。
+ * navigation.js の keydown ハンドラとは独立して動作（互いに干渉しない）。
+ */
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        const dropdown = document.getElementById("export-dropdown");
+        if (dropdown && !dropdown.hasAttribute("hidden")) {
+            closeExportMenu();
+            e.preventDefault();
+        }
+    }
+});
+
+    /* ===== export-png.js ===== */
+/* export-png.js
+ * PNG / ZIP エクスポート: html2canvas + JSZip の動的ロード。
+ *
+ * 依存:
+ *   - view-toggle.js  : currentView
+ *   - navigation.js   : cur（現在スライドのインデックス）
+ *
+ * Step 4 の JS 統合順: fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png
+ *
+ * 設計原則:
+ *   1. 外部 CDN は「エクスポート操作時のみ」動的ロード。閲覧自体は完全自己完結を維持。
+ *   2. 2 回目以降の呼び出しではロード済み <script> を再利用（重複ロードなし)。
+ *   3. エラーは alert で明示通知。console.error だけだとユーザーが気づかない。
+ *   4. キャプチャ範囲は .slide 要素そのもの（960×540 のネイティブサイズ）。
+ *      hero モードの transform: scale() の影響を受けないよう、
+ *      onclone でクローン DOM 側の transform を明示的に解除する。
+ *
+ * v0.2.1 修正:
+ *   - hero モードでの右端切れバグを修正（onclone フックで transform を解除）
+ *   - print.css の二重防御と同じ哲学を PNG キャプチャにも適用
+ */
+
+/* ==========================================================================
+ * 1. CDN URL の定義
+ * ========================================================================== */
+
+const HTML2CANVAS_CDN = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+const JSZIP_CDN       = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+
+/* ==========================================================================
+ * 2. 動的スクリプトロードのヘルパー
+ * ========================================================================== */
+
+/**
+ * 指定 URL のスクリプトを動的にロードする。
+ * 既にロード済みの場合は即座に resolve（重複ロードを防ぐ）。
+ *
+ * @param {string} src - スクリプトの URL
+ * @returns {Promise<void>}
+ */
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        // 既にロード済みなら何もせず resolve
+        if (document.querySelector(`script[src="${src}"]`)) {
+            return resolve();
+        }
+        const s = document.createElement('script');
+        s.src = src;
+        s.async = false; // 依存順を保つため非同期実行を抑制
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error(`Failed to load: ${src}`));
+        document.head.appendChild(s);
+    });
+}
+
+/* ==========================================================================
+ * 3. html2canvas の共通オプション
+ * ========================================================================== */
+
+/**
+ * html2canvas のオプションを生成する。
+ * 現在のテーマ背景色を引き継ぐため、関数化して都度呼び出す。
+ *
+ * v0.2.1 で onclone フックを追加。hero モードの transform: scale() による
+ * getBoundingClientRect ずれを回避するため、クローン DOM 側で transform を解除する。
+ * 画面表示には一切影響しない（クローン DOM のみが対象）。
+ *
+ * @returns {object} html2canvas のオプション
+ */
+function buildCanvasOptions() {
+    return {
+        width: 960,            // スライドのネイティブ幅
+        height: 540,           // スライドのネイティブ高さ
+        scale: 2,              // レティナ相当（1920×1080 で出力）
+        useCORS: true,         // CORS 対応の外部画像をキャプチャ可能に
+        allowTaint: false,     // 汚染キャンバスは作らない（CORS NG の画像は欠落させる）
+        backgroundColor: getComputedStyle(document.body).backgroundColor,
+        logging: false,        // コンソールログを抑制
+
+        /**
+         * クローン DOM に対する事前操作（v0.2.1 で追加）。
+         *
+         * 画面表示には一切影響せず、html2canvas が見るクローン DOM だけを修正する。
+         * 修正内容は print.css の @media print と同じ哲学:
+         *   hero モードの transform: scale() / position: fixed / opacity: 0 を解除して、
+         *   素のレイアウト（960×540 の box）でキャプチャできるようにする。
+         *
+         * @param {Document} clonedDoc - html2canvas が複製した DOM ツリー
+         */
+        onclone: (clonedDoc) => {
+            // 3-1. .slide-scaler の position/transform を解除
+            //      hero モードの「position: fixed + transform: scale()」を素の配置に戻す。
+            //      これで getBoundingClientRect が CSS の 960×540 と一致する。
+            const scaler = clonedDoc.querySelector('.slide-scaler');
+            if (scaler) {
+                scaler.style.position = 'static';
+                scaler.style.top = 'auto';
+                scaler.style.left = 'auto';
+                scaler.style.transform = 'none';
+                scaler.style.width = '960px';
+                scaler.style.height = '540px';
+            }
+
+            // 3-2. 全 .slide を relative + opacity:1 に強制
+            //      hero モードの「position: absolute + inset: 0 + opacity: 0」を解除し、
+            //      キャプチャ対象スライドが確実に可視化される状態にする。
+            clonedDoc.querySelectorAll('.slide').forEach((s) => {
+                s.style.position = 'relative';
+                s.style.inset = 'auto';
+                s.style.top = 'auto';
+                s.style.left = 'auto';
+                s.style.transform = 'none';
+                s.style.opacity = '1';
+                s.style.pointerEvents = 'auto';
+            });
+
+            // 3-3. .slide-inner の scale を解除
+            //      list モードからキャプチャされたケースの保険。
+            //      view-toggle.js が scaleListSlides() で setしている transform を解除する。
+            clonedDoc.querySelectorAll('.slide-inner').forEach((inner) => {
+                inner.style.transform = 'none';
+            });
+        },
+    };
+}
+
+/* ==========================================================================
+ * 4. 単一スライド PNG エクスポート
+ * ========================================================================== */
+
+/**
+ * 現在表示中のスライドを PNG としてダウンロードする。
+ * hero モード・list モードどちらでも動作する。
+ */
+async function exportSinglePNG() {
+    try {
+        // 1. html2canvas を動的ロード（2 回目以降はキャッシュ）
+        await loadScript(HTML2CANVAS_CDN);
+
+        // 2. 現在スライドを取得
+        const allSlides = document.querySelectorAll('.slide');
+        const idx = (typeof cur !== 'undefined') ? cur : 0;
+        const slide = allSlides[idx];
+
+        if (!slide) {
+            throw new Error('対象スライドが見つかりません');
+        }
+
+        // 3. キャプチャ
+        const canvas = await html2canvas(slide, buildCanvasOptions());
+
+        // 4. PNG として blob 化 → ダウンロード
+        canvas.toBlob((blob) => {
+            if (!blob) {
+                throw new Error('PNG の生成に失敗しました');
+            }
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `slide-${String(idx + 1).padStart(2, '0')}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 'image/png');
+
+    } catch (e) {
+        showExportError('PNGエクスポート', e);
+    }
+}
+
+/* ==========================================================================
+ * 5. 全スライド ZIP エクスポート
+ * ========================================================================== */
+
+/**
+ * 全スライドを PNG にキャプチャし、ZIP ファイルとしてダウンロードする。
+ * 各スライドは slide-01.png 〜 slide-NN.png として連番格納される。
+ */
+async function exportAllPNG() {
+    try {
+        // 1. html2canvas と JSZip を並行ロード
+        await Promise.all([
+            loadScript(HTML2CANVAS_CDN),
+            loadScript(JSZIP_CDN),
+        ]);
+
+        // 2. 全スライドを取得
+        const allSlides = document.querySelectorAll('.slide');
+        if (allSlides.length === 0) {
+            throw new Error('スライドが見つかりません');
+        }
+
+        // 3. ZIP インスタンスを作成
+        // eslint-disable-next-line no-undef
+        const zip = new JSZip();
+
+        // 4. 各スライドを順にキャプチャして ZIP に追加
+        //    onclone で transform を解除しているため、hero/list どちらのモードでも正常にキャプチャできる
+        for (let i = 0; i < allSlides.length; i++) {
+            const canvas = await html2canvas(allSlides[i], buildCanvasOptions());
+            const dataUrl = canvas.toDataURL('image/png');
+            const base64 = dataUrl.split(',')[1];
+            const filename = `slide-${String(i + 1).padStart(2, '0')}.png`;
+            zip.file(filename, base64, { base64: true });
+        }
+
+        // 5. ZIP blob を生成してダウンロード
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'slides.zip';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+    } catch (e) {
+        showExportError('ZIPエクスポート', e);
+    }
+}
+
+/* ==========================================================================
+ * 6. エラー通知ヘルパー
+ * ========================================================================== */
+
+/**
+ * エクスポート失敗時にユーザーへ alert で通知する。
+ * 失敗原因の候補を箇条書きで提示し、代替手段（PDF）を案内する。
+ *
+ * @param {string} action - 失敗した操作名（例: "PNGエクスポート"）
+ * @param {Error}  error  - 発生したエラー
+ */
+function showExportError(action, error) {
+    const message = [
+        `${action}に失敗しました。`,
+        '',
+        '考えられる原因：',
+        '・ネットワーク接続が不安定（CDN ロード失敗）',
+        '・外部画像が CORS 未対応',
+        '・ブラウザがダウンロードをブロックした',
+        '',
+        'オフライン環境では P キーから PDF エクスポートをご利用ください。',
+        '',
+        `詳細: ${error.message || error}`,
+    ].join('\n');
+
+    alert(message);
+    console.error(`[${action}] ${error.message || error}`, error);
+}
+
+  </script>
+</body>
+</html>

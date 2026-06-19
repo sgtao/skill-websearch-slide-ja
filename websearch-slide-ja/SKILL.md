@@ -45,6 +45,7 @@ description: >
 | `references/chart-generation.md` | Step 3-0 グラフ化判定、Step 4 グラフ埋め込み |
 | `references/export-recipes.md` | Step 4：エクスポート機能（PDF/PNG/ZIP）組み込み |
 | `references/output-validation.md` | Step 5：品質検証・修正確認 |
+| `references/example-outputs/README.md` | Step 3 構成設計：テーマ傾向が近いお手本の構成スケルトンを参照（実HTMLは原則開かない／トークン肥大防止） |
 | `assets/base-template.html` | Step 4 開始時に必ずコピーして土台にする |
 | `assets/styles/*.css` | 全 7 ファイルを統合（theme-vars → slide-core → nav-controls → figure → chart → list-view → print） |
 | `assets/scripts/*.js` | 全 6 ファイルを統合（fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png） |
@@ -212,6 +213,18 @@ description: >
 ## Step 3: スライド構成の設計
 
 `references/slide-layouts.md` を参照して構成を決める。
+
+### テーマ傾向 → お手本対応表
+
+構成設計時、テーマ傾向に近い完成例の **構成スケルトンのみ** を
+`references/example-outputs/README.md` から参照する（実HTMLはロードしない／トークン肥大防止）。
+
+| テーマ傾向 | 参照する例 | 主に学べる点 |
+|---|---|---|
+| 動向・提言の紹介（データ＋写真で説得） | example-trend-fullpath | グラフ＋画像(onerror)＋出典のフルパス構成・stat |
+| 製品・ツールの比較 | example-product-comparison | グラフ2本＋`slide-fit`比較テーブル＋2×2カード |
+| 手順・チュートリアル | example-tutorial | 1スライド1ステップ＋コードブロック（コード中心） |
+| ビジネス提案・意思決定 | example-business-pitch | 課題→施策→効果→依頼の論理＋KPIグラフ＋`callout` |
 
 | モード | 枚数 | 使用条件 |
 |--------|------|---------|

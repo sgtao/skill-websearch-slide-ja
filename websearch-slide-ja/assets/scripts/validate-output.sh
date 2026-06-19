@@ -358,6 +358,23 @@ done
 
 [[ "$BANNED_FOUND" -eq 0 ]] && pass "禁止ライブラリなし（html2canvas / JSZip は許容）"
 
+# ── 図解 / SVG 自己完結性・色ハードコード ─────────────────────────────────────
+# 図解は完全自己完結が必須（外部画像参照を持たない）
+SVG_SELFCONTAINED=1
+if grep -qiE '<image[ >]|xlink:href' "$FILE" 2>/dev/null; then
+  fail "SVG 内に外部参照（<image> / xlink:href）を検出（図解は完全自己完結が必須）"
+  SVG_SELFCONTAINED=0
+fi
+# SVG プレゼンテーション属性での色ハードコード（CSS の var() ではなく fill="#…"）
+HARDCODE_COLOR=$(grep -oE '(fill|stroke)="#' "$FILE" 2>/dev/null | wc -l | tr -d ' ') || true
+if [[ "$HARDCODE_COLOR" -gt 0 ]]; then
+  warn "SVG の色ハードコード（fill=\"#…\" / stroke=\"#…\"）が ${HARDCODE_COLOR} 件。chart-series-N / diagram-* クラス経由に直す"
+fi
+[[ "$SVG_SELFCONTAINED" -eq 1 && "$HARDCODE_COLOR" -eq 0 ]] && pass "SVG は自己完結・色はクラス経由（fill=\"#\" なし）"
+# INFO: 図解の数
+DIAGRAM_COUNT=$(grep -oE 'class="diagram-svg"' "$FILE" 2>/dev/null | wc -l | tr -d ' ') || true
+info "図解（diagram-svg）: ${DIAGRAM_COUNT} 個"
+
 # ── 外部 CDN 参照数 ────────────────────────────────────────────────────────────
 # 許容: Google Fonts(1) + html2canvas 文字列(1) + JSZip 文字列(1) = 3 件前後
 CDN_COUNT=0

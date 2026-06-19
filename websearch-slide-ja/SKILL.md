@@ -21,7 +21,7 @@ description: >
 1-B. テーマ・ロール確認
 1-C. 検索フレーズ提案＋ビジュアル方針確認
 2.   Web検索・情報収集
-3-0. グラフ化判定
+3-0. ビジュアル化判定（グラフ / 図解）
 3.   スライド構成の設計
 4.   HTMLスライド生成（エクスポート機能込み）
 5.   ファイル出力・提示・検証
@@ -43,11 +43,12 @@ description: >
 | `references/design-tokens.md` | Step 4：CSS変数・カラー埋め込み |
 | `references/image-embedding.md` | Step 2 画像収集、Step 4 画像埋め込み |
 | `references/chart-generation.md` | Step 3-0 グラフ化判定、Step 4 グラフ埋め込み |
+| `references/diagram-generation.md` | Step 3-0 図解判定、Step 4 図解（インラインSVG）埋め込み |
 | `references/export-recipes.md` | Step 4：エクスポート機能（PDF/PNG/ZIP）組み込み |
 | `references/output-validation.md` | Step 5：品質検証・修正確認 |
 | `references/example-outputs/README.md` | Step 3 構成設計：テーマ傾向が近いお手本の構成スケルトンを参照（実HTMLは原則開かない／トークン肥大防止） |
 | `assets/base-template.html` | Step 4 開始時に必ずコピーして土台にする |
-| `assets/styles/*.css` | 全 7 ファイルを統合（theme-vars → slide-core → nav-controls → figure → chart → list-view → print） |
+| `assets/styles/*.css` | 全 8 ファイルを統合（theme-vars → slide-core → nav-controls → figure → chart → diagram → list-view → print） |
 | `assets/scripts/*.js` | 全 6 ファイルを統合（fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png） |
 | `assets/fallback-image.html` | 画像埋め込み時に `createFallback()` をコピー |
 | `assets/chart-templates/*.svg` | グラフ埋め込み時に該当テンプレートをコピー |
@@ -190,23 +191,41 @@ description: >
 
 ---
 
-## Step 3-0: グラフ化判定
+## Step 3-0: ビジュアル化判定（グラフ / 図解）
 
-> **スキップ条件**: ビジュアル方針が「テキストのみ」のとき、または「[グラフデータ候補]」が 0 件のとき。
+> **スキップ条件**: ビジュアル方針が「テキストのみ」のとき。
 
 ### 手順
 
+まず「伝えたいもの」で手段を振り分ける（ビジュアル化判定表）。
+
+| 伝えたいもの | 使う手段 | 参照 |
+|---|---|---|
+| 数量比較・推移・割合 | グラフ | chart-generation.md |
+| 構造・流れ・関係・循環 | 図解（インラインSVG） | diagram-generation.md |
+| 実物・外部の権威ある図 | 画像 | image-embedding.md |
+| 上記以外 | テキスト | — |
+
+**グラフ採用判定**（「[グラフデータ候補]」が 1 件以上のとき）
 1. `references/chart-generation.md` を読み込む
 2. 各候補について 4 条件（数値性 / 3 点以上 / 単位・出典 / 種別判定可能性）を判定。**全 YES のみ採用**
 3. 採用候補は「データ形状 → グラフ種別マッピング」でテンプレートを決定（bar / line / donut / scatter）
-4. 採用結果を以下の形式で記録：
+
+**図解採用判定**（構造・流れ・循環を説明したいとき）
+1. `references/diagram-generation.md` を読み込む
+2. パターンを選ぶ：手順・処理の流れ → 横フロー／構成・階層 → 縦レイヤー／循環 → サイクル
+3. 図に描く要素・矢印は **出典で確認できた関係に限る**（推測の接続を足さない）
+
+採用結果を以下の形式で記録：
 
 ```
 [グラフ採用リスト]
 スライド N: テンプレート bar-chart.svg / タイトル「...」 / 系列 1 / データ点 5
+[図解採用リスト]
+スライド M: パターン 横フロー / ノード 4 / タイトル「...」
 ```
 
-**制約**: 1 スライドあたりグラフは最大 1 つ。画像とグラフは同一スライドに共存させない。
+**制約**: 1 スライドあたりグラフは最大 1 つ。グラフ・図解・画像は同一スライドに共存させない。
 
 ---
 
@@ -225,6 +244,7 @@ description: >
 | 製品・ツールの比較 | example-product-comparison | グラフ2本＋`slide-fit`比較テーブル＋2×2カード |
 | 手順・チュートリアル | example-tutorial | 1スライド1ステップ＋コードブロック（コード中心） |
 | ビジネス提案・意思決定 | example-business-pitch | 課題→施策→効果→依頼の論理＋KPIグラフ＋`callout` |
+| 構造・流れ・循環の説明 | example-diagram | インラインSVG図解（横フロー/縦レイヤー/サイクル）・外部依存ゼロ |
 
 | モード | 枚数 | 使用条件 |
 |--------|------|---------|
@@ -272,7 +292,7 @@ Slide N     : 参考リンク・出典 URL 一覧
 ### 生成手順
 
 1. `assets/base-template.html` をコピーして土台にする
-2. `assets/styles/` の **7 ファイル**を `<style>` に統合（`theme-vars → slide-core → nav-controls → figure → chart → list-view → print` の順、print.css は必ず最後）
+2. `assets/styles/` の **8 ファイル**を `<style>` に統合（`theme-vars → slide-core → nav-controls → figure → chart → diagram → list-view → print` の順、print.css は必ず最後）
 3. `references/slide-layouts.md` を参照し、各スライドを `<section class="slide">` で記述
    - 10 行超のテーブル・20 項目超の一覧を含むスライドには `class="slide slide-fit"` を付与
 4. **画像埋め込み**（ビジュアル方針「グラフ作成＋画像あり」のときのみ）
@@ -286,8 +306,13 @@ Slide N     : 参考リンク・出典 URL 一覧
    - `<div class="slide-chart">` でラップして配置
    - HTML パターンと座標計算は `chart-generation.md` を参照
    - 制約: SVG はインライン展開のみ。色は `chart-series-N` / `chart-line-N` クラス経由（ハードコード禁止）。外部グラフライブラリ禁止
-6. `assets/scripts/` の **6 ファイル**を `<script>` に統合（`fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png` の順）
-7. `.control-cluster` 内に `.export-menu` ブロックが含まれることを確認（base-template に標準で含まれている）。キーボードショートカット（P / Shift+S / Shift+P）は navigation.js 改修版に組み込み済み
+6. **図解埋め込み**（Step 3-0 で図解採用のときのみ）
+   - `references/diagram-generation.md` の座標テーブルに従い、`<svg class="diagram-svg" viewBox="0 0 960 480">` を `<div class="slide-diagram">` でラップして配置
+   - パターン（横フロー / 縦レイヤー / サイクル）とノード数を選び、**既定座標にテキストを流し込む**（座標計算はしない）
+   - 制約: SVG はインライン展開のみ。色は `diagram-*` クラス経由（`fill="#"` 禁止）。外部 `href` / `xlink:href` 禁止（完全自己完結）。長いラベルは `<tspan>` で手動 2 行に分割
+   - グラフ・図解・画像は同一スライドに共存させない
+7. `assets/scripts/` の **6 ファイル**を `<script>` に統合（`fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png` の順）
+8. `.control-cluster` 内に `.export-menu` ブロックが含まれることを確認（base-template に標準で含まれている）。キーボードショートカット（P / Shift+S / Shift+P）は navigation.js 改修版に組み込み済み
 
 ### 機能チェック表
 

@@ -3,6 +3,59 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.5.0] - 2026-06-19
+
+### 追加｜インラインSVG図解・お手本テンプレート集
+- **インラインSVG図解の自動生成（diagram）**
+  - 構造・流れ・関係・循環を、外部依存ゼロのインラインSVGで描画。3パターン（横フロー／縦レイヤー／サイクル）に対応
+  - パターンごとに完成済みの座標テーブルを用意し、LLMは座標計算をせず「既定座標にテキストを流し込む」だけで作図できる設計
+  - 色は `diagram-*` クラス経由でライト/ダークに自動追従（`fill="#"` ハードコード禁止）。長いラベルは `<tspan>` で手動2行分割
+  - グラフ・図解・画像は同一スライドに共存させない（1スライド1ビジュアル）
+- **`assets/styles/diagram.css`**（図解スタイル）／**`references/diagram-generation.md`**（3パターンの座標表・規約）を新規追加
+- **Step 3-0 を「グラフ化判定」→「ビジュアル化判定（グラフ / 図解）」に拡張**
+  - 「伝えたいもの」で手段を振り分けるビジュアル化判定表（数量→グラフ／構造・流れ・循環→図解／実物→画像）を追加
+  - Step 4 に「図解埋め込み」手順を追加。CSS統合順に `diagram` を挿入（全8ファイル構成に変更）
+- **`validate-output.sh` に図解の自己完結チェックを追加**
+  - SVGの外部参照（`<image>` / `xlink:href`）検出、色ハードコード（`fill`/`stroke="#"`）検出、図解数（`diagram-svg`）のINFO表示
+- **お手本テンプレート集（`references/example-outputs/`）を新規追加**
+  - 完成例5種（trend-fullpath / product-comparison / tutorial / business-pitch / diagram）と二層構成のREADME
+  - Claudeは構成スケルトンのみを読み、実HTML（約65〜72KB）はロードしない（トークン肥大防止）
+  - SKILL.md の Step 3 に「テーマ傾向 → お手本対応表」を追加
+- **`scripts/install.sh`（インストール支援スクリプト）を新規追加**
+  - SKILL.md を持つディレクトリを自動検出 → `~/.claude/skills` へコピー（確認あり）。`--zip` で配布用ZIPを生成
+  - 関数ベース構成（ログヘルパー＋単機能関数＋`main`）。`-y`（確認なし）/ `--help` / `CLAUDE_SKILLS_DIR` 上書き / 非対話環境の安全スキップに対応
+
+### 修正
+- **`validate-output.sh` のスライド枚数カウント誤検知（off-by-one）を修正**
+  - `list-view.css` 内の使い方コメント（`id="sN"`）に対する誤WARNしていた問題を修正
+  - スライド数・slide-fit数の集計を `id="s<数字>"` を要求する正規表現に変更（コメント行を確実に除外）
+
+### 変更
+- **検証スクリプトの参照パスを `scripts/` → `assets/scripts/` に統一**
+  - SKILL.md（参照ファイルガイド・Step 5-B）、`validate-output.sh` 内部のUsage表記、README をすべて更新
+- **Step 3-0 のスキップ条件を見直し**
+  - 新: 「テキストのみのとき」（数値データがなくても図解は採用しうるため）
+- **README のタイトルを `skill-websearch-slide-ja` に変更**し、図解機能を特徴一覧に追記
+
+### ファイル構成の変更
+```
+追加:
+  scripts/install.sh
+  websearch-slide-ja/assets/styles/diagram.css
+  websearch-slide-ja/references/diagram-generation.md
+  websearch-slide-ja/references/example-outputs/README.md
+  websearch-slide-ja/references/example-outputs/example-trend-fullpath.html
+  websearch-slide-ja/references/example-outputs/example-product-comparison.html
+  websearch-slide-ja/references/example-outputs/example-tutorial.html
+  websearch-slide-ja/references/example-outputs/example-business-pitch.html
+  websearch-slide-ja/references/example-outputs/example-diagram.html
+変更:
+  README.md                              （タイトル変更 / 図解機能追記 / validatorパス修正）
+  websearch-slide-ja/SKILL.md            （Step 3-0 拡張 / 図解埋め込み手順 / お手本対応表 / CSS 7→8 / パス修正）
+  websearch-slide-ja/assets/scripts/validate-output.sh（枚数カウント修正 / 図解チェック追加 / Usageパス修正）
+```
+
+---
 ## [v0.4.0] - 2026-06-06
 
 ### 追加｜出力検証スクリプト・品質改善

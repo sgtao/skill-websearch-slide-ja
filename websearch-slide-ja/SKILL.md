@@ -52,7 +52,7 @@ description: >
 | `assets/scripts/*.js` | 全 6 ファイルを統合（fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png） |
 | `assets/fallback-image.html` | 画像埋め込み時に `createFallback()` をコピー |
 | `assets/chart-templates/*.svg` | グラフ埋め込み時に該当テンプレートをコピー |
-| `scripts/validate-output.sh` | Step 5：生成 HTML の機械的チェック |
+| `assets/scripts/validate-output.sh` | Step 5：生成 HTML の機械的チェック |
 
 ## ステップ別スキップ条件（早見表）
 
@@ -294,23 +294,23 @@ Slide N     : 参考リンク・出典 URL 一覧
 1. `assets/base-template.html` をコピーして土台にする
 2. `assets/styles/` の **8 ファイル**を `<style>` に統合（`theme-vars → slide-core → nav-controls → figure → chart → diagram → list-view → print` の順、print.css は必ず最後）
 3. `references/slide-layouts.md` を参照し、各スライドを `<section class="slide">` で記述
-   - 10 行超のテーブル・20 項目超の一覧を含むスライドには `class="slide slide-fit"` を付与
+  - 10 行超のテーブル・20 項目超の一覧を含むスライドには `class="slide slide-fit"` を付与
 4. **画像埋め込み**（ビジュアル方針「グラフ作成＋画像あり」のときのみ）
-   - `references/image-embedding.md` の判断フローを実行
-   - 1 件でも埋め込む場合、`assets/fallback-image.html` の `createFallback()` を `<script>` の先頭にコピー
-   - 全 `<img>` に `onerror` でフォールバックを設定
-   - HTML パターンは `image-embedding.md` を参照
+  - `references/image-embedding.md` の判断フローを実行
+  - 1 件でも埋め込む場合、`assets/fallback-image.html` の `createFallback()` を `<script>` の先頭にコピー
+  - 全 `<img>` に `onerror` でフォールバックを設定
+  - HTML パターンは `image-embedding.md` を参照
 5. **グラフ埋め込み**（Step 3-0 で採用されたときのみ）
-   - 「[グラフ採用リスト]」の対象スライドに、採用テンプレートの SVG をコピー
-   - プレースホルダー `{TITLE}` `{SOURCE}` データ値を実値に置換
-   - `<div class="slide-chart">` でラップして配置
-   - HTML パターンと座標計算は `chart-generation.md` を参照
-   - 制約: SVG はインライン展開のみ。色は `chart-series-N` / `chart-line-N` クラス経由（ハードコード禁止）。外部グラフライブラリ禁止
+  - 「[グラフ採用リスト]」の対象スライドに、採用テンプレートの SVG をコピー
+  - プレースホルダー `{TITLE}` `{SOURCE}` データ値を実値に置換
+  - `<div class="slide-chart">` でラップして配置
+  - HTML パターンと座標計算は `chart-generation.md` を参照
+  - 制約: SVG はインライン展開のみ。色は `chart-series-N` / `chart-line-N` クラス経由（ハードコード禁止）。外部グラフライブラリ禁止
 6. **図解埋め込み**（Step 3-0 で図解採用のときのみ）
-   - `references/diagram-generation.md` の座標テーブルに従い、`<svg class="diagram-svg" viewBox="0 0 960 480">` を `<div class="slide-diagram">` でラップして配置
-   - パターン（横フロー / 縦レイヤー / サイクル）とノード数を選び、**既定座標にテキストを流し込む**（座標計算はしない）
-   - 制約: SVG はインライン展開のみ。色は `diagram-*` クラス経由（`fill="#"` 禁止）。外部 `href` / `xlink:href` 禁止（完全自己完結）。長いラベルは `<tspan>` で手動 2 行に分割
-   - グラフ・図解・画像は同一スライドに共存させない
+  - `references/diagram-generation.md` の座標テーブルに従い、`<svg class="diagram-svg" viewBox="0 0 960 480">` を `<div class="slide-diagram">` でラップして配置
+  - パターン（横フロー / 縦レイヤー / サイクル）とノード数を選び、**既定座標にテキストを流し込む**（座標計算はしない）
+  - 制約: SVG はインライン展開のみ。色は `diagram-*` クラス経由（`fill="#"` 禁止）。外部 `href` / `xlink:href` 禁止（完全自己完結）。長いラベルは `<tspan>` で手動 2 行に分割
+  - グラフ・図解・画像は同一スライドに共存させない
 7. `assets/scripts/` の **6 ファイル**を `<script>` に統合（`fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png` の順）
 8. `.control-cluster` 内に `.export-menu` ブロックが含まれることを確認（base-template に標準で含まれている）。キーボードショートカット（P / Shift+S / Shift+P）は navigation.js 改修版に組み込み済み
 
@@ -348,7 +348,7 @@ Slide N     : 参考リンク・出典 URL 一覧
 
 **検証フロー:**
 
-1. `bash scripts/validate-output.sh {出力ファイル}` を実行する
+1. `bash assets/scripts/validate-output.sh {出力ファイル}` を実行する
 2. 結果を確認する：
 
 **ALL PASS の場合:**

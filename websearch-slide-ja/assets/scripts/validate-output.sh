@@ -2,7 +2,7 @@
 # =============================================================================
 # validate-output.sh — websearch-slide-ja 生成 HTML 品質チェックスクリプト
 #
-# Usage : bash scripts/validate-output.sh <file.html>
+# Usage : bash assets/scripts/validate-output.sh <file.html>
 # Exit  : 0 = ALL PASS (WARN のみ含む) / 1 = FAIL あり
 #
 # チェック項目:
@@ -41,7 +41,7 @@ section() { printf "\n${C_BOLD}[%s]${C_RESET}\n---\n" "$1"; }
 FILE="${1:-}"
 if [[ -z "$FILE" ]]; then
   printf "${C_FAIL}Error${C_RESET}: ファイルパスを指定してください\n" >&2
-  printf "Usage: bash scripts/validate-output.sh <file.html>\n" >&2
+  printf "Usage: bash assets/scripts/validate-output.sh <file.html>\n" >&2
   exit 1
 fi
 if [[ ! -f "$FILE" ]]; then
@@ -100,7 +100,7 @@ section "2/8 スライド枚数チェック"
 
 # <section class="slide..."> をカウント（CSS クラス名の誤カウントを防ぐため section タグ基点）
 SLIDE_COUNT=0
-SLIDE_COUNT=$(grep -c '<section class="slide' "$FILE") || true
+SLIDE_COUNT=$(grep -cE '<section class="slide[^"]*" id="s[0-9]+"' "$FILE") || true
 
 if [[ "$SLIDE_COUNT" -eq 0 ]]; then
   fail "スライドが 0 枚（<section class=\"slide\"> が存在しない）"
@@ -114,7 +114,7 @@ fi
 
 # slide-fit 枚数（参考情報 — <section タグのみ対象）
 SLIDEFIT_COUNT=0
-SLIDEFIT_COUNT=$(grep -c '<section class="slide slide-fit"' "$FILE") || true
+SLIDEFIT_COUNT=$(grep -cE '<section class="slide slide-fit" id="s[0-9]+"' "$FILE") || true
 if [[ "$SLIDEFIT_COUNT" -gt 0 ]]; then
   info "slide-fit スライド: ${SLIDEFIT_COUNT} 枚（一覧テーブル用・高さ可変）"
 fi

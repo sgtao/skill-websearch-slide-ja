@@ -3,6 +3,54 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.5.1] - 2026-07-07
+
+### 修正｜ドキュメント整合・軽微バグ修正（Phase 0）
+
+- **`base-template.html` の CSS 統合コメントを 7 → 8 ファイルに更新**
+  - v0.5.0 で追加した `diagram.css` の追記漏れを解消（SKILL.md 側は更新済みだった）
+- **`example-diagram.html` の混入文字と重複 ID を修正**
+  - `</body>` 直後に紛れ込んでいた文字 `A` を除去（html-validate で構文エラーになる状態を解消）
+  - `<marker id="arrow">` が s3 / s5 の 2 図解で文書内重複していたため、`arrow-s3` / `arrow-s5` にスコープ化
+  - 適用は `scripts/apply-v051-fixes.sh` で自動実行・自動検証（冪等）
+- **`fit-slide.js` の resize リスナーに `typeof currentView` ガードを追加**
+  - view-toggle.js が未統合・統合失敗の場合の ReferenceError を防止
+  - navigation.js の export 系 typeof ガードと同じ防御規約に統一
+- **`design-tokens.md` を変数リファレンスに再構成**
+  - theme-vars.css / theme-toggle.js と三重管理になっていたカラーコード・JS 実装の再掲を削除
+  - 「変数の正（Single Source of Truth）は theme-vars.css」と明記（v0.6.0 パレット追加前の地ならし）
+- **`output-validation.md` のスクリプトパスを `assets/scripts/` に統一**
+  - v0.5.0 のパス統一時の修正漏れ 2 箇所（「スクリプト実行方法」セクション）
+
+### 追加
+
+- **`diagram-generation.md` に marker id 一意性ルールを追記**
+  - HTML の id は文書全体で一意であること、複数図解デッキではスライド番号でスコープすることを共通雛形に明記（再発防止）
+- **`scripts/apply-v051-fixes.sh`（修正適用スクリプト）**
+  - example-diagram.html へのピンポイント修正・孤児ファイル削除・3 項目の機械検証＋validate-output.sh 実行までを一括実行
+
+### 削除
+
+- **`references/search-patterns.md`（孤児ファイル）**
+  - v0.1.0 で `search-patterns/` 配下（index / tech / business / specialist）へ分割後に残存していた旧一枚岩ファイル。SKILL.md からの参照なし・内容重複のため削除
+
+### ファイル構成の変更
+
+```
+追加:
+  scripts/apply-v051-fixes.sh
+変更:
+  websearch-slide-ja/assets/base-template.html          （CSSコメント 7→8 ファイル）
+  websearch-slide-ja/assets/scripts/fit-slide.js        （typeof ガード）
+  websearch-slide-ja/references/design-tokens.md        （変数リファレンス化・重複削除）
+  websearch-slide-ja/references/output-validation.md    （パス修正 2 箇所）
+  websearch-slide-ja/references/diagram-generation.md   （marker id 一意性ルール）
+  websearch-slide-ja/references/example-outputs/example-diagram.html（スクリプトで適用）
+削除:
+  websearch-slide-ja/references/search-patterns.md
+```
+
+---
 ## [v0.5.0] - 2026-06-19
 
 ### 追加｜インラインSVG図解・お手本テンプレート集

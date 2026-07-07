@@ -7,27 +7,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     /*
-     * ここに以下を統合する（assets/styles/ の全CSSを結合・全 7 ファイル）:
+     * ここに以下を統合する（assets/styles/ の全CSSを結合・全 8 ファイル）:
      *   1. theme-vars.css   → :root / [data-theme="dark"] のCSS変数
      *   2. slide-core.css   → html,body / .slide-scaler / .slide / .slide-inner
      *   3. nav-controls.css → .control-cluster / .nav-arrow / #progress-bar / #slide-counter
      *                          + .export-menu / .export-dropdown (Phase 3 で追加)
      *   4. figure.css       → .slide-figure / .slide-figure-fallback (Phase 2)
      *   5. chart.css        → .chart-* / .slide-chart (Phase 2 グラフ)
-     *   6. list-view.css    → body[data-view="list"] 系の全ルール
-     *   7. print.css        → @media print + .exporting-pdf (Phase 3 で追加)
+     *   6. diagram.css      → .slide-diagram / .diagram-* (v0.5.0 図解)
+     *   7. list-view.css    → body[data-view="list"] 系の全ルール
+     *   8. print.css        → @media print + .exporting-pdf (Phase 3 で追加・必ず最後)
      */
   </style>
 </head>
 <body>
-
   <!-- 右上コントロール（テーマ + ビュー切替 + エクスポート） -->
   <div class="control-cluster">
     <button id="theme-toggle" onclick="toggleTheme()" title="テーマ切替（クリック）">
       <span id="theme-icon">🌙</span>
     </button>
     <button id="view-toggle" onclick="toggleView()" title="表示切替（V）">☰</button>
-
     <!-- ▼ Phase 3: エクスポートメニュー -->
     <div class="export-menu">
       <button id="export-toggle" onclick="toggleExportMenu()" title="エクスポート">📥</button>
@@ -47,17 +46,13 @@
       </div>
     </div>
   </div>
-
   <!-- プログレスバー（最上部） -->
   <div id="progress-bar"></div>
-
   <!-- スケーラー（hero時: 16:9固定中央配置、list時: 縦並びスクロール） -->
   <div class="slide-scaler">
-
     <!-- ナビ矢印（hero時のみ表示） -->
     <button class="nav-arrow nav-prev" id="btn-prev" onclick="navigate(-1)">&#8249;</button>
     <button class="nav-arrow nav-next" id="btn-next" onclick="navigate(1)">&#8250;</button>
-
     <!-- ========== スライド本体（ここを各スライドで繰り返す） ========== -->
     <!--
       各スライドは <section class="slide"> で作成し、
@@ -65,7 +60,6 @@
       最初のスライドのみ class="slide active" とする。
       data-num 属性は JS が自動で付与するので不要。
     -->
-
     <section class="slide active" id="s1">
       <div class="slide-inner">
         <!-- タイトルスライド例 -->
@@ -78,21 +72,16 @@
         </div>
       </div>
     </section>
-
     <section class="slide" id="s2">
       <div class="slide-inner">
         <!-- 2枚目以降のスライド -->
         <!-- references/slide-layouts.md の各レイアウトを参照 -->
       </div>
     </section>
-
     <!-- 以降、スライド枚数分 <section class="slide" id="sN"> を追加 -->
-
     <!-- スライド番号（hero時のみ表示） -->
     <div id="slide-counter">1 / N</div>
-
   </div><!-- /.slide-scaler -->
-
   <script>
     /*
      * ここに以下を統合する（assets/scripts/ の全JSを結合・全 6 ファイル）:
@@ -107,12 +96,10 @@
      * 注: export-pdf.js / export-png.js は CDN を動的ロードする。
      *     閲覧時は外部リソースなしで動作し、エクスポート操作時のみネット接続が必要。
      */
-
     // --- navigation.js の変数（他のJSから参照されるため先に宣言） ---
     const slides = document.querySelectorAll('.slide');
     const total  = slides.length;
     let cur = 0;
-
     // ここに統合したJSを貼り付ける
   </script>
 </body>

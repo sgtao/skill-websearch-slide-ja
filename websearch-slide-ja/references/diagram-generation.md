@@ -42,9 +42,7 @@ Step 3-0（図解採用判定）と Step 4（図解埋め込み）で読む。
         <path d="M0,0 L10,5 L0,10 z" class="diagram-arrowhead" />
       </marker>
     </defs>
-
     <!-- ノードとエッジ（パターン別座標表に従う） -->
-
     <text x="920" y="470" class="diagram-source" text-anchor="end">出典: …</text>
   </svg>
 </div>
@@ -52,6 +50,11 @@ Step 3-0（図解採用判定）と Step 4（図解埋め込み）で読む。
 
 - スライド見出しは既存の `.slide-title` を使う（svg内にタイトルを重複させない）。
 - エッジは `<path class="diagram-edge" marker-end="url(#arrow)" d="M x1,y1 L x2,y2"/>`。
+- **marker id は文書内で一意にする（v0.5.1 追記）**：HTML の `id` は SVG ごとではなく
+  **文書全体で共有される**。1デッキに図解が複数あるときは `id="arrow-s3"` のように
+  スライド番号でスコープし、`marker-end="url(#arrow-s3)"` の参照も同じ名前に揃える。
+  図解が 1 つだけのデッキなら `arrow` のままでよい
+  （例: example-diagram.html は s3 / s5 の 2 図解を `arrow-s3` / `arrow-s5` でスコープ済み）。
 
 ---
 
@@ -68,6 +71,7 @@ Step 3-0（図解採用判定）と Step 4（図解埋め込み）で読む。
 | 5 | 144 | 40(112), 224(296), 408(480), 592(664), 776(848) | 184→224, 368→408, 552→592, 736→776 |
 
 例（N=3 の1ノード目）:
+
 ```html
 <rect class="diagram-node" x="40" y="185" width="267" height="90" rx="8"/>
 <text class="diagram-label" x="174" y="230">情報収集</text>
@@ -124,6 +128,7 @@ Step 3-0（図解採用判定）と Step 4（図解埋め込み）で読む。
 | 4 | ①→②(521,126→583,188) ②→③(589,276→527,338) ③→④(439,344→377,282) ④→①(371,194→433,132) |
 
 例（ノード①）:
+
 ```html
 <circle class="diagram-node" cx="480" cy="85" r="58"/>
 <text class="diagram-label" x="480" y="85">投資</text>

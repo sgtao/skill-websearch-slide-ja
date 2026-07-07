@@ -35,13 +35,13 @@
 Claude Code 環境・ローカル環境での実行:
 
 ```bash
-bash scripts/validate-output.sh path/to/output.html
+bash assets/scripts/validate-output.sh path/to/output.html
 ```
 
 Claude.ai 環境での実行（bash_tool 経由）:
 
 ```bash
-bash scripts/validate-output.sh /mnt/user-data/outputs/{テーマ}-slides.html
+bash assets/scripts/validate-output.sh /mnt/user-data/outputs/{テーマ}-slides.html
 ```
 
 ---

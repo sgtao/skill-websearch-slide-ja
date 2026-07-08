@@ -39,7 +39,7 @@ Web検索で情報収集して、スライド形式のHTMLページを生成す�
   - 10行超テーブル・20項目超一覧を含むスライドで `slide-fit` クラスを自動付与
   - 一覧モード（`V`）切替時にコンテンツ全体を表示。hero モードの16:9固定は維持
 - **生成HTML品質チェックスクリプト（v0.4.0〜）**
-  - `bash assets/scripts/validate-output.sh <file.html>` でHTML構文・必須要素・CSS/JSリーク等を8カテゴリ自動検証
+  - `bash assets/scripts/validate-output.sh <file.html>` でHTML構文・必須要素・CSS/JSリーク等を9カテゴリ自動検証
   - 「検証して」の指示で実行。FAILがある場合は修正するか確認してから対応
 
 ### このスキルが目指すもの

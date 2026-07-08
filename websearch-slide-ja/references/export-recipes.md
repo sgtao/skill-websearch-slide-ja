@@ -211,13 +211,10 @@ if (e.key === 'S' && e.shiftKey  && !e.ctrlKey) { e.preventDefault(); exportSing
 Step 4 で HTML 生成後、以下を確認する。
 
 ### CSS 統合
-- [ ] `print.css` を 7 番目（最後）に統合した
-- [ ] 統合順は `theme-vars → slide-core → nav-controls → figure → chart → list-view → print`
+- [ ] `print.css` を最後に統合した（統合するファイルと順序の正は SKILL.md の参照ファイルガイド／Step 4）
 
 ### JS 統合
-- [ ] `export-pdf.js` を 5 番目に統合した
-- [ ] `export-png.js` を 6 番目（最後）に統合した
-- [ ] 統合順は `fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png`
+- [ ] `export-pdf.js` → `export-png.js` の相対順を守って統合した（全体の統合順の正は SKILL.md の参照ファイルガイド／Step 4）
 
 ### HTML 要素
 - [ ] `.control-cluster` 内に `.export-menu` を追加した

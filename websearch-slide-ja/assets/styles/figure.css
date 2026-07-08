@@ -1,7 +1,6 @@
 /* figure.css
  * スライド内の画像フィギュア（.slide-figure）スタイル。
- * slide-core.css の読み込み後、list-view.css の前に統合する。
- * Step 4 の CSS 統合順: theme-vars → slide-core → nav-controls → figure → list-view
+ * 統合順の正は SKILL.md（参照ファイルガイド／Step 4）を参照。
  */
 
 /* ─── フィギュアコンテナ ─── */

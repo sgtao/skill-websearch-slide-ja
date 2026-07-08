@@ -6,7 +6,13 @@ websearch-slide-ja の完成例集。テーマ傾向ごとに「構成の型」�
   「スライド構成スケルトン」だけを読む。**実HTMLは原則開かない**
   （1本あたり約65〜72KB ≒ 15K〜20Kトークンのため、トークン肥大防止）。
 - **人間の使い方**: 実HTML（`example-*.html`）をブラウザで開いて完成イメージを確認。
-- 全例は `assets/scripts/validate-output.sh` を **Errors 0 / Warnings 0** で通過済み
+- 全例は **v0.5.0 時点の** `validate-output.sh` で Errors 0 / Warnings 0 を確認済み
+  （生成物自体も v0.5.x 仕様。パレットUIは含まない）
+- **v0.6.0 以降の validator に本フォルダの例をかけると、パレット関連項目
+  （`palette-menu` / `palette-dropdown` / `setPalette` 等）が FAIL する。
+  これは既知・仕様どおり**であり、お手本は Step 3 の構成スケルトン参照用
+  のためパレット対応のための再生成は行わない（新規デッキは v0.6.0 仕様で
+  生成されるため影響なし）
 
 ---
 

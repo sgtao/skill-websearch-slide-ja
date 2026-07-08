@@ -7,17 +7,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     /*
-     * ここに以下を統合する（assets/styles/ の全CSSを結合・全 8 ファイル）:
-     *   1. theme-vars.css   → :root / [data-theme="dark"] / [data-palette=…] のCSS変数
-     *                          （v0.6.0: 5パレット定義を含む）
-     *   2. slide-core.css   → html,body / .slide-scaler / .slide / .slide-inner
-     *   3. nav-controls.css → .control-cluster / .nav-arrow / #progress-bar / #slide-counter
-     *                          + .export-menu / .export-dropdown (Phase 3 で追加)
-     *   4. figure.css       → .slide-figure / .slide-figure-fallback (Phase 2)
-     *   5. chart.css        → .chart-* / .slide-chart (Phase 2 グラフ)
-     *   6. diagram.css      → .slide-diagram / .diagram-* (v0.5.0 図解)
-     *   7. list-view.css    → body[data-view="list"] 系の全ルール
-     *   8. print.css        → @media print + .exporting-pdf (Phase 3 で追加・必ず最後)
+     * ここに assets/styles/ の全 CSS を結合して統合する。
+     * 統合するファイルと順序の正（SSoT）は SKILL.md の「参照ファイルガイド」
+     * および Step 4 生成手順を参照する（print.css は必ず最後）。
      */
   </style>
 </head>
@@ -111,16 +103,9 @@
   </div><!-- /.slide-scaler -->
   <script>
     /*
-     * ここに以下を統合する（assets/scripts/ の全JSを結合・全 7 ファイル）:
-     *   1. fit-slide.js     → fitSlide()
-     *   2. theme-toggle.js  → toggleTheme() + 初期化
-     *   3. view-toggle.js   → toggleView() / applyView() / scaleListSlides()
-     *   4. navigation.js    → navigate() / updateArrows() / keyboard / fullscreen
-     *                          + エクスポート系ショートカット (Phase 3 で追加)
-     *   5. export-pdf.js    → exportPDF() / toggleExportMenu() / closeExportMenu() (Phase 3)
-     *   6. export-png.js    → exportSinglePNG() / exportAllPNG() / loadScript() (Phase 3)
-     *   7. palette-toggle.js→ setPalette() / togglePaletteMenu() / closePaletteMenu() (v0.6.0)
-     *
+     * ここに assets/scripts/ の全 JS を結合して統合する。
+     * 統合するファイルと順序の正（SSoT）は SKILL.md の「参照ファイルガイド」
+     * および Step 4 生成手順を参照する。
      * 注: export-pdf.js / export-png.js は CDN を動的ロードする。
      *     閲覧時は外部リソースなしで動作し、エクスポート操作時のみネット接続が必要。
      */

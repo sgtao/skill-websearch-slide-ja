@@ -6,7 +6,7 @@
  *   - print.css       : @media print の定義（1ページ=1スライド）
  *   - view-toggle.js  : currentView / applyView()
  *
- * Step 4 の JS 統合順: fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png
+ * 統合順の正は SKILL.md（参照ファイルガイド／Step 4）を参照。
  *
  * 設計原則:
  *   1. hero モードから印刷した場合、一時的に list モードへ切り替えて全スライドを可視化する。

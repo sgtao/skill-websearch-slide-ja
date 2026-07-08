@@ -5,7 +5,7 @@
  *   - view-toggle.js  : currentView
  *   - navigation.js   : cur（現在スライドのインデックス）
  *
- * Step 4 の JS 統合順: fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png
+ * 統合順の正は SKILL.md（参照ファイルガイド／Step 4）を参照。
  *
  * 設計原則:
  *   1. 外部 CDN は「エクスポート操作時のみ」動的ロード。閲覧自体は完全自己完結を維持。

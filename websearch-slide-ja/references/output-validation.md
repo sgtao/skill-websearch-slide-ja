@@ -7,11 +7,11 @@
 
 ## 検証フローの起動条件
 
-以下のいずれかに該当する場合に実行する：
+ユーザーが明示的に検証を要求した場合に**のみ**実行する
+（SKILL.md Step 5-B と同一の規則。デフォルトでは実行しない）。
 
-1. ユーザーが明示的に検証を要求した
-2. 生成 HTML の枚数が 10 枚以上（複雑な出力）
-3. グラフ＋画像の両方を含む出力
+なお、生成 HTML が 10 枚以上・グラフ＋画像の両方を含む等の複雑な出力では、
+出力提示時に「検証しますか？」と**提案してよい**（実行はユーザーの同意後）。
 
 ---
 
@@ -22,7 +22,7 @@
 | 1 | HTML 構文 | DOCTYPE / html / head / body の存在 | PASS/FAIL |
 | 2 | スライド枚数 | 3〜12 枚の範囲内か | PASS/FAIL/WARN |
 | 3 | 必須要素 | theme-toggle / view-toggle / nav-arrow / progress-bar / slide-counter / export-menu / palette-menu | PASS/FAIL |
-| 4 | **JS 構文（v0.6.1 追加）** | `<script>` 全体が `node --check` でパース可能か | PASS/FAIL/WARN |
+| 4 | JS 構文 | `<script>` 全体が `node --check` でパース可能か | PASS/FAIL/WARN |
 | 5 | 必須関数 | fitSlide / toggleTheme / toggleView / navigate / exportPDF / exportSinglePNG / setPalette | PASS/FAIL |
 | 6 | 出典リンク | 最終スライドに `<a href=` が存在するか | PASS/WARN |
 | 7 | CSS/JSリーク | `<style>`/`<script>` 外にCSS定義・JS定義が漏れていないか | PASS/FAIL |

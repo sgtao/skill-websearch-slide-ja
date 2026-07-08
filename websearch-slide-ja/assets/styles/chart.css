@@ -1,6 +1,6 @@
 /* chart.css
  * SVG グラフ要素のスタイル。
- * Step 4 の CSS 統合順: theme-vars → slide-core → nav-controls → figure → chart → list-view
+ * 統合順の正は SKILL.md（参照ファイルガイド／Step 4）を参照。
  *
  * 設計原則:
  *   1. 色のハードコード禁止。すべて theme-vars.css の --chart-* を参照する。

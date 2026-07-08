@@ -54,6 +54,9 @@ description: >
 | `assets/chart-templates/*.svg` | グラフ埋め込み時に該当テンプレートをコピー |
 | `assets/scripts/validate-output.sh` | Step 5：生成 HTML の機械的チェック |
 
+> **CSS/JS 統合順の Single Source of Truth（SSoT）は本表と Step 4 の生成手順。**
+> assets/ 配下の各 CSS/JS のヘッダーコメントや他の references には統合順を再掲しない。
+
 ## ステップ別スキップ条件（早見表）
 
 | ビジュアル方針 / モード | Step 2 画像収集 | Step 2 数値抽出 | Step 3-0 グラフ化 |
@@ -420,16 +423,16 @@ Slide N     : 参考リンク・出典 URL 一覧
 - [ ] CORS エラー / ネット切断時に alert でエラー通知が出るか
 - [ ] 印刷時にダークテーマがライトに上書きされ、コントロール類が非表示になるか
 
-### H. コンテンツ漏洩チェック（Phase 5 追加）
+### H. コンテンツ漏洩チェック
 - [ ] `<section>` / `<div class="slide-inner">` の直下に CSS 定義テキスト（`[data-theme="dark"]`、`var(--`、`:root {` 等）が表示されていないか
 - [ ] JavaScript コード断片（`function `、`const `、`document.`）がスライドの可視テキストとして漏れていないか
 - [ ] SVG テンプレートのプレースホルダー（`{TITLE}`、`{SOURCE}`、`{AXIS_X_LABEL}` 等）が未置換のまま残っていないか
 
-### I. オーバーフロー対策（Phase 5 追加）
+### I. オーバーフロー対策
 - [ ] 10 行超のテーブルや 20 項目超の一覧を含むスライドに `slide-fit` クラスが付与されているか
 - [ ] `slide-fit` が通常の概要・メインコンテンツスライドに誤って付与されていないか
 
-### J. JS 構文の健全性（v0.6.1 追加）
+### J. JS 構文の健全性
 - [ ] `<script>` 内にエスケープシーケンス（`\n` 等）を含むコードを転記する際、実際の改行文字に化けていないか
 - [ ] JS/CSS ソースをテキストとして手で書き写さず、ファイル読み込み＋機械的な文字列結合で扱っているか
 - [ ] 生成直後に `validate-output.sh` の JS 構文チェック（項目4）が PASS するか（H節のリークチェックとは別に、構文そのものが壊れていないかを確認する）

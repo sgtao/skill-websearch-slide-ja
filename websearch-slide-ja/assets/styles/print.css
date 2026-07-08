@@ -1,6 +1,6 @@
 /* print.css
  * 印刷・PDF エクスポート用スタイル。
- * Step 4 の CSS 統合順: theme-vars → slide-core → nav-controls → figure → chart → list-view → print
+ * 統合順の正は SKILL.md（参照ファイルガイド／Step 4）を参照。
  * （必ず最後に読み込む。他の CSS を @media print で上書きするため）
  *
  * 設計原則:

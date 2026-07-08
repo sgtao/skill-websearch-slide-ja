@@ -142,6 +142,8 @@ check_elem 'プログレスバー    #progress-bar'            'id="progress-bar
 check_elem 'スライド番号      #slide-counter'           'id="slide-counter"'
 check_elem 'エクスポートメニュー .export-menu'          'class="export-menu"'
 check_elem 'エクスポートドロップダウン #export-dropdown' 'id="export-dropdown"'
+check_elem 'パレットメニュー    .palette-menu'            'class="palette-menu"'
+check_elem 'パレットドロップダウン #palette-dropdown'      'id="palette-dropdown"'
 check_elem 'スライドスケーラー .slide-scaler'           'class="slide-scaler"'
 
 # =============================================================================
@@ -173,6 +175,9 @@ check_func "exportSinglePNG"    # export-png.js
 check_func "exportAllPNG"
 check_func "loadScript"
 check_func "buildCanvasOptions"
+check_func "setPalette"         # palette-toggle.js (v0.6.0)
+check_func "togglePaletteMenu"
+check_func "closePaletteMenu"
 
 # =============================================================================
 # [5] 出典リンクチェック（5-5）

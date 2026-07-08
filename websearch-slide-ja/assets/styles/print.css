@@ -54,6 +54,35 @@ body.exporting-pdf .slide {
         --chart-label:    var(--text-secondary);
     }
 
+    /* ─── 2-1b. パレット別 accent（v0.6.0）: 印刷時はライト値を強制 ─── */
+    /* 2-1 の上書きは Ocean（既定）の accent を含むため、他パレット選択時は
+       各パレットの「ライトテーマ値」をここで再指定する（インク節約・コントラスト確保）。
+       特異度 (0,2,1) > 2-1 の (0,1,0) および theme-vars.css のパレットルール (0,2,0)。 */
+    html[data-palette="forest"],
+    html[data-palette="forest"][data-theme="dark"] {
+        --accent:       #059669;
+        --accent-light: #ECFDF5;
+        --accent-dim:   #D1FAE5;
+    }
+    html[data-palette="sunset"],
+    html[data-palette="sunset"][data-theme="dark"] {
+        --accent:       #EA580C;
+        --accent-light: #FFF7ED;
+        --accent-dim:   #FFEDD5;
+    }
+    html[data-palette="plum"],
+    html[data-palette="plum"][data-theme="dark"] {
+        --accent:       #7C3AED;
+        --accent-light: #F5F3FF;
+        --accent-dim:   #EDE9FE;
+    }
+    html[data-palette="graphite"],
+    html[data-palette="graphite"][data-theme="dark"] {
+        --accent:       #334155;
+        --accent-light: #F1F5F9;
+        --accent-dim:   #E2E8F0;
+    }
+    /* ocean は 2-1 の既定値がそのまま適用される（再指定不要） */
     /* ─── 2-2. ページ設定（1280×720 landscape、余白ゼロ） ─── */
     @page {
         size: 1280px 720px landscape;

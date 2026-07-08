@@ -49,7 +49,7 @@ description: >
 | `references/example-outputs/README.md` | Step 3 構成設計：テーマ傾向が近いお手本の構成スケルトンを参照（実HTMLは原則開かない／トークン肥大防止） |
 | `assets/base-template.html` | Step 4 開始時に必ずコピーして土台にする |
 | `assets/styles/*.css` | 全 8 ファイルを統合（theme-vars → slide-core → nav-controls → figure → chart → diagram → list-view → print） |
-| `assets/scripts/*.js` | 全 6 ファイルを統合（fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png） |
+| `assets/scripts/*.js` | 全 7 ファイルを統合（fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png → palette-toggle） |
 | `assets/fallback-image.html` | 画像埋め込み時に `createFallback()` をコピー |
 | `assets/chart-templates/*.svg` | グラフ埋め込み時に該当テンプレートをコピー |
 | `assets/scripts/validate-output.sh` | Step 5：生成 HTML の機械的チェック |
@@ -272,7 +272,7 @@ Slide N     : 参考リンク・出典 URL 一覧
 ### デザイン原則
 
 - フォント: Noto Sans JP（本文）+ JetBrains Mono（コード）
-- アクセントカラー 1 色のみ（`--accent`）
+- アクセントカラー 1 色のみ（`--accent`）。5 パレット（ocean / forest / sunset / plum / graphite）を定義済みで、生成後に HTML 右上の 🎨 メニューで切替可能（生成時のデフォルト: ocean）
 - 文字中心・広い余白・箇条書き主体
 - スライドサイズ: 960×540px 固定（16:9）、`transform: scale()` でフィット
 - 詳細は `references/design-tokens.md`
@@ -311,7 +311,7 @@ Slide N     : 参考リンク・出典 URL 一覧
   - パターン（横フロー / 縦レイヤー / サイクル）とノード数を選び、**既定座標にテキストを流し込む**（座標計算はしない）
   - 制約: SVG はインライン展開のみ。色は `diagram-*` クラス経由（`fill="#"` 禁止）。外部 `href` / `xlink:href` 禁止（完全自己完結）。長いラベルは `<tspan>` で手動 2 行に分割
   - グラフ・図解・画像は同一スライドに共存させない
-7. `assets/scripts/` の **6 ファイル**を `<script>` に統合（`fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png` の順）
+7. `assets/scripts/` の **7 ファイル**を `<script>` に統合（`fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png → palette-toggle` の順）
 8. `.control-cluster` 内に `.export-menu` ブロックが含まれることを確認（base-template に標準で含まれている）。キーボードショートカット（P / Shift+S / Shift+P）は navigation.js 改修版に組み込み済み
 
 ### 機能チェック表
@@ -327,6 +327,7 @@ Slide N     : 参考リンク・出典 URL 一覧
 | 単一 PNG 出力 | `exportSinglePNG()` + html2canvas |
 | 全 ZIP 出力 | `exportAllPNG()` + JSZip |
 | エクスポートメニュー | `.export-menu` + `toggleExportMenu()` |
+| パレット切替（5 色） | `[data-palette]` + `setPalette()` + localStorage 永続化 |
 | 一覧テーブル高さ可変 | `.slide-fit` + `list-view.css` + `print.css` |
 | キーボード操作 | `←→` 移動 / `Space` 次へ / `F` フルスクリーン / `V` ビュー切替 / `P` PDF / `Shift+S` PNG / `Shift+P` ZIP |
 
@@ -389,6 +390,7 @@ Slide N     : 参考リンク・出典 URL 一覧
 ### C. レイアウト・テーマ
 - [ ] 960×540px（16:9）固定で `transform: scale()` フィットが動作するか
 - [ ] ライト／ダーク切替が動作するか
+- [ ] 🎨 パレット切替が 5 色すべてで動作し、リロード後も選択が保持されるか
 - [ ] hero／list 切替が動作し、list でクリックすると hero に戻るか
 - [ ] 日本語フォントが正しく読み込まれているか
 

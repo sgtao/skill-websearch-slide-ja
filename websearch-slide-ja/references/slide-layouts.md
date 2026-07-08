@@ -212,6 +212,74 @@ Slide N   : 参考リンク・出典
 
 ---
 
+### feature-showcase
+
+左ライト・右ダークの2カラムで機能・手順を1つずつ強調紹介する型。
+
+```html
+<section class="slide feature-showcase" id="sN">
+  <div class="slide-inner">
+    <div class="feature-left">
+      <div class="eyebrow">EYEBROW</div>
+      <h2>見出し<span class="hl">強調</span></h2>
+      <p class="feat-lead">説明文</p>
+    </div>
+    <div class="feature-right">
+      <div class="feature-num">02</div>
+      <div class="feat-eyebrow">FEATURE</div>
+      <div class="feat-heading">機能名</div>
+      <div class="feat-sub">補足</div>
+      <ul class="feat-list">
+        <li><span class="feat-ico">&#9654;</span><span><span class="feat-label">項目</span><span class="feat-desc">説明</span></span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+```
+
+**動作仕様**
+
+| モード | 挙動 |
+|--------|------|
+| ライト | 左＝白（--bg-slide）/ 右＝ダーク（--bg-surface-dark） |
+| ダーク | 左右とも --bg-slide（統一ダーク） |
+| 印刷 | 右ダーク面を維持（構造視認性を優先） |
+
+- 連番は 01 から。リスト項目は3〜4個推奨。強調は `.hl`（--accent・パレット追従）。
+- テンプレート固有CSSはデッキ側 `<style>` 末尾に追記（骨格CSSの統合順は不変）。
+
+---
+
+### comparison-chart
+
+同一指標の前後比較を、左に説明文・右にドーナツ×2で見せる型。
+
+```html
+<section class="slide" id="sN">
+  <div class="slide-inner">
+    <div class="slide-with-description">
+      <div class="cmp-left">
+        <div class="cmp-big">225GB<small>解放</small></div>
+        <h2>...<span class="hl">...</span></h2>
+        <div class="cmp-divider"></div>
+        <p class="cmp-lead">...</p>
+        <div class="cmp-stats">...</div>
+      </div>
+      <div class="cmp-right">
+        <div class="slide-chart comparison">
+          <svg viewBox="0 0 720 360" class="chart-svg"><!-- ドーナツ×2＋矢印＋凡例 --></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+```
+
+- 座標は `chart-generation.md` の「comparison-chart（2ドーナツ）座標テーブル」を参照。
+- **1スライド1グラフ制約の例外**（同一指標の Before/After のみ）。
+
+---
+
 ## スライド選択ガイド
 
 | 情報の種類 | 推奨レイアウト |
@@ -223,6 +291,8 @@ Slide N   : 参考リンク・出典
 | 数値・トレンドの提示 | リスト系 + 補足メモ |
 | 10行超のテーブル・全件一覧 | 一覧テーブル（`slide-fit`） |
 | 締めくくり | まとめ |
+| 機能・手順の1つずつ強調 | feature-showcase |
+| 同一指標の前後比較 | comparison-chart（ドーナツ×2） |
 
 ---
 

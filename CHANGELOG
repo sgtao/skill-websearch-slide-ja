@@ -3,6 +3,40 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.6.2] - 2026-07-09
+
+### 追加｜新テンプレート2種（feature-showcase / comparison-chart）
+
+- **Feature ショーケース型（`feature-showcase`）**: 左ライト・右ダークの2カラムで「機能・手順を1つずつ強調紹介」する型。大型ナンバリング（01/02…）＋アイコン付きリスト。ライト/ダーク切替で**ダーク時は左右を統一ダークに反転**、印刷時は右ダーク面を維持
+- **Before/After 比較型（`comparison-chart`）**: 同一指標の前後比較を、**ドーナツ×2＋中央値＋矢印＋凡例テーブル**で1スライドに表示。左に説明文・右にグラフ（`.slide-with-description`）
+- **強調スタイルの拡充**: `.hl` クラス（強調テキスト＝`--accent`・パレット追従）、大型数値（`.feature-num` / `.cmp-big`）を追加
+- **「1スライド1グラフ」制約に例外規定を追加**: `comparison-chart` に限り、同一指標の Before/After ドーナツ2つの共存を許可（異なる指標の2グラフ並置は引き続き禁止）。SKILL.md・chart-generation.md・diagram-generation.md の関係5箇所に明記
+- **`theme-vars.css` に3変数追加**: `--bg-surface-dark` / `--text-on-dark` / `--text-on-dark-2`（feature-showcase の右ダーク面用）
+- テンプレート固有CSSは**デッキ側 `<style>` 末尾に追記**する方式とし、骨格CSS（統合順）は不変
+
+### 検証（リリース前確認済み）
+
+- サンプル2種（example-feature-showcase / example-before-after）が `validate-output.sh` で **ALL PASS（Errors 0 / Warnings 0）**
+- feature-showcase のテーマ別背景カスケード（ライト時=右ダーク / ダーク時=左右統一 / 印刷時=右ダーク維持）を機械検証
+- 2ドーナツの合計値一致（Before/After とも 926GB）を機械検証
+
+### ファイル構成の変更
+
+```
+追加:
+  websearch-slide-ja/references/example-outputs/example-feature-showcase.html
+  websearch-slide-ja/references/example-outputs/example-before-after.html
+変更:
+  websearch-slide-ja/SKILL.md
+  websearch-slide-ja/assets/styles/theme-vars.css
+  websearch-slide-ja/assets/styles/print.css
+  websearch-slide-ja/references/slide-layouts.md
+  websearch-slide-ja/references/chart-generation.md
+  websearch-slide-ja/references/diagram-generation.md
+  websearch-slide-ja/references/example-outputs/README.md
+```
+
+---
 ## [v0.6.1] - 2026-07-09
 
 ### 修正｜ドキュメント整合・統合順のSSoT化

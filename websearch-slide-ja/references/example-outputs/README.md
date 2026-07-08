@@ -25,6 +25,8 @@ websearch-slide-ja の完成例集。テーマ傾向ごとに「構成の型」�
 | example-tutorial | 手順・チュートリアル | 手順＋コード | 10 | 導入する開発者 | なし | なし | なし | 4 |
 | example-business-pitch | ビジネス提案 | 提案 | 10 | 意思決定層（経営/PM/EM） | bar×1 | なし | なし | 5 |
 | example-diagram | 構造・流れ・循環の説明 | 図解 | 8 | エンジニア／企画 | なし | なし | なし | 3 |
+| example-feature-showcase | 機能紹介 | feature-showcase | 8 | エンジニア／企画 | なし | なし | なし | 1 |
+| example-before-after | 前後比較 | comparison-chart | 6 | 一般／技術 | donut×2 | なし | なし | 1 |
 
 > 「型」の選び分け：データ＋写真で説得 → フルパス／複数候補の優劣 → 比較／操作手順 → チュートリアル／投資判断を仰ぐ → 提案／構造・流れ・循環 → 図解。
 

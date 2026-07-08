@@ -238,6 +238,21 @@ body.exporting-pdf .slide {
         max-height: 440px !important;
     }
 
+
+    /* ─── feature-showcase の右ダーク面は印刷でもダーク維持 ─── */
+    /* ライト強制の例外。構造の視認性を優先する。 */
+    .feature-right {
+        background: var(--bg-surface-dark) !important;
+    }
+    .feature-right,
+    .feature-right .feat-desc {
+        color: var(--text-on-dark) !important;
+    }
+    .feature-right .feature-num,
+    .feature-right .feat-label {
+        color: var(--accent) !important;
+    }
+
     /* ─── 2-10. 色の印刷を強制（重要） ─── */
     /* ブラウザのデフォルトは「背景色・画像を印刷しない」設定の場合があるため、
        全要素で color-adjust を exact に。アクセントカラーやチャートが

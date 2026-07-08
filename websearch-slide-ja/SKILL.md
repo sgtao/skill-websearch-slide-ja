@@ -230,6 +230,8 @@ description: >
 
 **制約**: 1 スライドあたりグラフは最大 1 つ。グラフ・図解・画像は同一スライドに共存させない。
 
+**例外**: `comparison-chart` レイアウト（Before/After比較）に限り、同一指標の Before/After ドーナツ2つを1スライドに共存させてよい。異なる指標のグラフを2つ並べることは引き続き禁止。
+
 ---
 
 ## Step 3: スライド構成の設計
@@ -331,6 +333,8 @@ Slide N     : 参考リンク・出典 URL 一覧
 | 全 ZIP 出力 | `exportAllPNG()` + JSZip |
 | エクスポートメニュー | `.export-menu` + `toggleExportMenu()` |
 | パレット切替（5 色） | `[data-palette]` + `setPalette()` + localStorage 永続化 |
+| Feature ショーケース（左右2カラム） | `.feature-showcase` + `.feature-left` / `.feature-right` |
+| Before/After 比較（ドーナツ×2） | `.slide-with-description` + `.slide-chart.comparison` |
 | 一覧テーブル高さ可変 | `.slide-fit` + `list-view.css` + `print.css` |
 | キーボード操作 | `←→` 移動 / `Space` 次へ / `F` フルスクリーン / `V` ビュー切替 / `P` PDF / `Shift+S` PNG / `Shift+P` ZIP |
 
@@ -411,7 +415,7 @@ Slide N     : 参考リンク・出典 URL 一覧
 - [ ] グラフに軸ラベル（X / Y）と出典が SVG 内に明記されているか
 - [ ] 色が `var(--chart-N)` / `var(--accent)` 経由でライト・ダーク両対応か（`fill="#..."` ハードコード禁止）
 - [ ] 数値ラベルとグラフ要素（バー・線・セクター）の両方が存在するか
-- [ ] 1 スライドあたりグラフ最大 1 つ、画像とグラフは同一スライドに共存していないか
+- [ ] 1 スライドあたりグラフ最大 1 つ（`comparison-chart` を除く）、画像とグラフは同一スライドに共存していないか
 - [ ] 「テキストのみ」「会話のみ」選択時にグラフが生成されていないか
 - [ ] Chart.js・D3.js 等の外部ライブラリ・`<canvas>`・CDN script を使用していないか
 

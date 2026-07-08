@@ -39,6 +39,11 @@
   --chart-5:     #8B5CF6;
   --chart-grid:  var(--border);
   --chart-label: var(--text-secondary);
+
+  /* feature-showcase 用（ライト時のみ使用・ダーク時は上書き） */
+  --bg-surface-dark: #161B22;
+  --text-on-dark:    #E6EDF3;
+  --text-on-dark-2:  #8B949E;
 }
 
 [data-theme="dark"] {
@@ -66,6 +71,11 @@
   --chart-5:     #A371F7;
   --chart-grid:  var(--border);
   --chart-label: var(--text-secondary);
+
+  /* feature-showcase 用（ライト時のみ使用・ダーク時は上書き） */
+  --bg-surface-dark: #161B22;
+  --text-on-dark:    #E6EDF3;
+  --text-on-dark-2:  #8B949E;
 }
 
 /* ==========================================================================

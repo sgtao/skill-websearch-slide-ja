@@ -3,6 +3,46 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.6.1] - 2026-07-09
+
+### 修正｜ドキュメント整合・統合順のSSoT化
+
+機能追加・生成挙動の変更なし。v0.6.0 時点の不整合を一括解消。
+
+- **example-outputs の検証状態注記を修正**: 「全例 ALL PASS」→「v0.5.0 時点の validator で確認済み・現行 v0.6.0 validator でのパレット項目 FAIL は既知」
+- **バージョン注記を統一**: JS 構文チェックは v0.6.0 収録済みのため、各ファイルの「v0.6.1 追加」注記を「v0.6.0 追加」へ修正
+- **validator セクション番号を統一**: `1/8`〜`3/8` → `1/9`〜`3/9`。README の「8カテゴリ」→「9カテゴリ」
+- **統合順の SSoT を SKILL.md に一本化**: `export-recipes.md` の旧統合順（CSS 7 / JS 6）を撤去し SKILL.md 参照化。CSS/JS ヘッダーコメントと `base-template.html` の統合コメントからも順序の再掲を撤去（機能的制約は残置）。SKILL.md の参照ファイルガイド直下に SSoT 宣言を追記
+- **output-validation.md の起動条件を SKILL.md Step 5-B に整合**: 「10枚以上で自動実行」→「明示要求時のみ実行・複雑な出力では提案可」
+- **`palette-toggle.js` の3要件を明文化**: 未知値フォールバック（許可リスト照合→`ocean`）・`is-active` 全ボタン同期・localStorage キー名 `slide-palette`
+
+### 追加
+
+- `scripts/apply-v061-fixes.sh`（修正16項目の一括適用・冪等・機械検証つき）
+
+### ファイル構成の変更
+
+```
+追加:
+  scripts/apply-v061-fixes.sh
+  websearch-slide-ja/assets/scripts/palette-toggle.js
+変更:
+  README.md
+  websearch-slide-ja/SKILL.md
+  websearch-slide-ja/assets/base-template.html
+  websearch-slide-ja/assets/styles/chart.css
+  websearch-slide-ja/assets/styles/figure.css
+  websearch-slide-ja/assets/styles/print.css
+  websearch-slide-ja/assets/styles/diagram.css
+  websearch-slide-ja/assets/scripts/export-pdf.js
+  websearch-slide-ja/assets/scripts/export-png.js
+  websearch-slide-ja/assets/scripts/validate-output.sh
+  websearch-slide-ja/references/export-recipes.md
+  websearch-slide-ja/references/output-validation.md
+  websearch-slide-ja/references/example-outputs/README.md
+```
+
+---
 ## [v0.6.0] - 2026-07-08
 
 ### 追加｜カラーパレット5色切替（生成HTML上で選択）

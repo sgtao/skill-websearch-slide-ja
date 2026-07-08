@@ -21,12 +21,26 @@
 |---|---------|-------------|------|
 | 1 | HTML 構文 | DOCTYPE / html / head / body の存在 | PASS/FAIL |
 | 2 | スライド枚数 | 3〜12 枚の範囲内か | PASS/FAIL/WARN |
-| 3 | 必須要素 | theme-toggle / view-toggle / nav-arrow / progress-bar / slide-counter / export-menu | PASS/FAIL |
-| 4 | 必須関数 | fitSlide / toggleTheme / toggleView / navigate / exportPDF / exportSinglePNG | PASS/FAIL |
-| 5 | 出典リンク | 最終スライドに `<a href=` が存在するか | PASS/WARN |
-| 6 | CSS/JSリーク | `<style>`/`<script>` 外にCSS定義・JS定義が漏れていないか | PASS/FAIL |
-| 7 | テンプレート残留 | `{TITLE}` `{SOURCE}` 等の未置換プレースホルダ | PASS/FAIL |
-| 8 | 禁止ライブラリ | Chart.js / D3.js / ECharts / `<canvas>` の参照 | PASS/FAIL |
+| 3 | 必須要素 | theme-toggle / view-toggle / nav-arrow / progress-bar / slide-counter / export-menu / palette-menu | PASS/FAIL |
+| 4 | **JS 構文（v0.6.1 追加）** | `<script>` 全体が `node --check` でパース可能か | PASS/FAIL/WARN |
+| 5 | 必須関数 | fitSlide / toggleTheme / toggleView / navigate / exportPDF / exportSinglePNG / setPalette | PASS/FAIL |
+| 6 | 出典リンク | 最終スライドに `<a href=` が存在するか | PASS/WARN |
+| 7 | CSS/JSリーク | `<style>`/`<script>` 外にCSS定義・JS定義が漏れていないか | PASS/FAIL |
+| 8 | テンプレート残留 | `{TITLE}` `{SOURCE}` 等の未置換プレースホルダ | PASS/FAIL |
+| 9 | 禁止ライブラリ | Chart.js / D3.js / ECharts / `<canvas>` の参照 | PASS/FAIL |
+
+### JS 構文チェック（項目4）について
+
+`node --check` で `<script>` ブロック全体をパースし、構文エラーの有無を確認する。
+**項目5（必須関数）は `grep` による文字列存在チェックのため、関数定義の文字列自体があっても
+それより前で構文エラーが起きて `<script>` 全体の実行が失敗しているケースを検出できない。**
+項目4はこの盲点を埋めるためのゲートであり、必ず項目5より前に実行する。
+
+- 実例: `showExportError()` 内の `].join('\n');` の `\n`（エスケープシーケンス）が
+  実際の改行文字に置き換わり、シングルクォート文字列が閉じられず構文エラーとなった。
+  この1箇所だけで `<script>` 内の全関数（`toggleTheme` 等）が定義されず、
+  生成された HTML 上のボタンがすべて無反応になった。
+- `node` が使えない環境では WARN でスキップする（Errors には数えない）。
 
 ---
 

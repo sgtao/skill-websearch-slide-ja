@@ -3,6 +3,57 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.6.0] - 2026-07-08
+
+### 追加｜カラーパレット5色切替（生成HTML上で選択）
+
+- **5 パレット導入**: Ocean（既定）/ Forest / Sunset / Plum / Graphite
+  - `html[data-palette="…"]` 属性方式。`theme-vars.css` を「テーマ × パレット」の2軸構成に拡張
+  - 差し替えは `--accent` / `--accent-light` / `--accent-dim` の3変数のみ。`--chart-2〜5` は全パレット共通とし、値管理の爆発（5×2×5=50値）を回避
+- **`assets/scripts/palette-toggle.js`（新規・JS統合順7番目）**: `setPalette()` 等、localStorageで永続化。export-menuと同じドロップダウン規約
+- **🎨 パレットピッカーUI**（`base-template.html` / `nav-controls.css`）: 5色スワッチ＋選択中表示
+- **印刷時のパレット追従**（`print.css`）: 各パレットのライトテーマ値を強制し、色相を保ったままコントラストを確保
+
+### 追加｜validate-output.sh に JS構文チェックを追加
+
+- 実機検証中、上段ボタン（テーマ・ビュー・パレット・エクスポート）が全て無反応になる不具合を発見。原因は `showExportError()` 内 `].join('\n');` の `\n` が実改行に化け、`<script>` 全体が構文エラーで無効化されていたこと
+- 従来の「必須JS関数チェック」は文字列存在チェックのみで、この種の構文エラーを検出できなかった
+- `validate-output.sh` に **JS構文チェック**（`node --check`）を新規カテゴリとして追加（全8→9カテゴリ）。必須関数チェックより前に実行し、`node` 不在時はWARNにフォールバック
+- パレット関連の要素・関数チェックも同時追加
+
+### 変更
+
+- **SKILL.md**: JS統合を全6→**7ファイル**（`… → export-png → palette-toggle`）に更新。デザイン原則・機能チェック表・チェックリストC/Jにパレット・JS構文項目を追記
+- **README.md**: 特徴一覧にパレット5色切替を追記
+- **references/output-validation.md**: 検証項目一覧を9項目に更新
+
+### 検証（リリース前確認済み）
+
+- 統合テストデッキで `validate-output.sh` **ALL PASS（Errors 0 / Warnings 0）**
+- CSSカスケード解決の機械検証: 5パレット×2テーマ＝10組すべて期待値に解決
+- JS構文チェック機能: 正常ファイルPASS・構文エラー再現ファイルFAIL・node不在環境WARNの3パターンを実機確認
+
+### 既知の限界
+
+- JS構文チェックは最初の `<script>` ブロックのみ対象（本スキルの生成物は1つのみ持つ想定）
+
+### ファイル構成の変更
+
+```
+追加:
+  websearch-slide-ja/assets/scripts/palette-toggle.js
+変更:
+  websearch-slide-ja/SKILL.md
+  websearch-slide-ja/assets/base-template.html
+  websearch-slide-ja/assets/styles/theme-vars.css
+  websearch-slide-ja/assets/styles/nav-controls.css
+  websearch-slide-ja/assets/styles/print.css
+  websearch-slide-ja/assets/scripts/validate-output.sh
+  websearch-slide-ja/references/output-validation.md
+  README.md
+```
+
+---
 ## [v0.5.1] - 2026-07-07
 
 ### 修正｜ドキュメント整合・軽微バグ修正（Phase 0）

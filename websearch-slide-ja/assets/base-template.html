@@ -24,25 +24,25 @@
     <div class="palette-menu">
       <button id="palette-toggle" onclick="togglePaletteMenu()" title="カラーパレット">🎨</button>
       <div id="palette-dropdown" class="palette-dropdown" hidden role="menu">
-        <button type="button" role="menuitem" data-palette-opt="ocean" class="is-active"
+        <button type="button" role="menuitem" data-palette-opt="ocean" class="pal-ocean is-active"
                 onclick="setPalette('ocean'); closePaletteMenu();">
-          <span class="palette-swatch swatch-ocean"></span>Ocean（既定）
+          <span class="palette-ico">🌊</span>Ocean（既定）
         </button>
-        <button type="button" role="menuitem" data-palette-opt="forest"
+        <button type="button" role="menuitem" data-palette-opt="forest" class="pal-forest"
                 onclick="setPalette('forest'); closePaletteMenu();">
-          <span class="palette-swatch swatch-forest"></span>Forest
+          <span class="palette-ico">🌲</span>Forest
         </button>
-        <button type="button" role="menuitem" data-palette-opt="sunset"
+        <button type="button" role="menuitem" data-palette-opt="sunset" class="pal-sunset"
                 onclick="setPalette('sunset'); closePaletteMenu();">
-          <span class="palette-swatch swatch-sunset"></span>Sunset
+          <span class="palette-ico">🌅</span>Sunset
         </button>
-        <button type="button" role="menuitem" data-palette-opt="plum"
+        <button type="button" role="menuitem" data-palette-opt="plum" class="pal-plum"
                 onclick="setPalette('plum'); closePaletteMenu();">
-          <span class="palette-swatch swatch-plum"></span>Plum
+          <span class="palette-ico">🍇</span>Plum
         </button>
-        <button type="button" role="menuitem" data-palette-opt="graphite"
+        <button type="button" role="menuitem" data-palette-opt="graphite" class="pal-graphite"
                 onclick="setPalette('graphite'); closePaletteMenu();">
-          <span class="palette-swatch swatch-graphite"></span>Graphite
+          <span class="palette-ico">⬛</span>Graphite
         </button>
       </div>
     </div>

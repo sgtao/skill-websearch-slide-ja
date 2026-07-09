@@ -396,6 +396,10 @@ BANNED_PATTERNS=(
   'unpkg\.com.*highcharts'
   'cdn\.jsdelivr\.net.*plotly'
   'cdn\.jsdelivr\.net.*apexcharts'
+  'cdn[^"'\'' ]*mermaid'
+  'mermaid\.min\.js'
+  'mermaid\.esm'
+  '<script[^>]*src="[^"]*mermaid'
 )
 for pat in "${BANNED_PATTERNS[@]}"; do
   if grep -qi "$pat" "$FILE" 2>/dev/null; then

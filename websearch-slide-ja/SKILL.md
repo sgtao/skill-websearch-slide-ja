@@ -6,7 +6,9 @@ description: >
   「スライドを作って」「プレゼン資料にして」「HTMLスライドで説明して」
   「〇〇についてスライドにまとめて」「GitHubのトレンドをスライドで」
   「Xで話題の〇〇をスライドに」などのフレーズが含まれる場合は必ずこのスキルを使う。
-  生成HTMLは PDF（印刷経由）と PNG（個別 / zip）のエクスポートに対応。
+  また、スライドMarkdown（中間形式）に対応：生成時は .md と .html を両方出力し、
+  「このMD（スライドMD）をスライドに変換して」「Markdownからスライドを生成して」
+  「スライドをMarkdownで出力して」「このスライドHTMLをMDに逆変換して」でも起動する。
 ---
 
 # Slide Generator Skill with Web Search (Japanese)
@@ -27,6 +29,19 @@ description: >
 5.   ファイル出力・提示・検証
 ```
 
+### エントリポイント判定（最初に必ず行う）
+
+依頼と添付物から、以下のいずれかで開始する。
+
+| 入力 | フロー |
+|---|---|
+| A) テーマの依頼（従来） | Step 0 → 1 → 2 → 3 → 4-A → 4-B → 5 |
+| B) スライドMD添付＋「変換して」 | 簡易確認 → Step 4-B → 5（Step 1〜3 と検索はスキップ） |
+| C) スライドHTML添付＋「MDにして」「編集して」 | 逆抽出（markdown-format.md §7）→ .md 提示 →（編集後）Step 4-B → 5 |
+
+B / C では `source-selection.md` のゲート群を通らず、Web検索も行わない。
+スライドMD の仕様は `references/markdown-format.md` を参照。
+
 ## 参照ファイルガイド
 
 各ステップで該当ファイルを必ず読むこと。
@@ -40,6 +55,7 @@ description: >
 | `references/search-patterns/business.md` | ビジネス系（PM / 経営 / マーケ / 営業 / 財務 / コンサル / オペレーション / 人事） |
 | `references/search-patterns/specialist.md` | 専門職（法務 / 研究者 / 医療 / 教育者 / 学生 / ライター） |
 | `references/slide-layouts.md` | Step 3 構成設計、Step 4 各スライド作成時 |
+| `references/markdown-format.md` | Step 4-A/4-B・HTML→MD逆抽出時：スライドMDの仕様 |
 | `references/design-tokens.md` | Step 4：CSS変数・カラー埋め込み |
 | `references/image-embedding.md` | Step 2 画像収集、Step 4 画像埋め込み |
 | `references/chart-generation.md` | Step 3-0 グラフ化判定、Step 4 グラフ埋め込み |
@@ -272,7 +288,27 @@ Slide N     : 参考リンク・出典 URL 一覧
 
 ---
 
-## Step 4: HTMLスライド生成
+## Step 4: スライド生成（MD中間層）
+
+> 生成は「4-A: スライドMD生成 → 4-B: MD→HTML変換」の2段構成。
+> スライドMD が Single Source of Truth（正）であり、HTML は MD から毎回フル再生成する。
+> LLM変換方式のため、再生成のたびに細部（余白・座標・文言）が揺れうる（仕様）。
+> エントリポイント B（MD添付）では 4-A をスキップして 4-B から実行する。
+
+### Step 4-A: スライドMD生成
+
+`references/markdown-format.md` の仕様で、Step 3 の構成スケルトンを `.md` に書き起こす。
+
+- frontmatter（`title` / `palette`）→ スライドディレクティブ（`<!-- slide: type -->`）→ 本文
+- グラフは `chart` データ記述ブロック（推奨）、図解は `diagram` ブロックまたは `mermaid`
+  サブセット（変換時にインラインSVG化。`mermaid.js` は最終HTMLに含めない）
+- ファイル名: `{テーマ}-slides.md`
+
+### Step 4-B: MD→HTML変換
+
+スライドMD を入力に、以下の手順で HTML を生成する（従来の Step 4 本体）。
+frontmatter `palette` があれば `<html data-palette="...">` を焼き込み、
+ドロップダウンの該当ボタンへ `is-active` を移す（markdown-format.md §6）。
 
 ### デザイン原則
 
@@ -344,9 +380,11 @@ Slide N     : 参考リンク・出典 URL 一覧
 
 ### 5-A. ファイル出力
 
-- ファイル名: `{テーマ}-slides.html`
+- ファイル名: `{テーマ}-slides.html` と `{テーマ}-slides.md`
 - 保存先: `/mnt/user-data/outputs/`
-- `present_files` で提示
+- **`.md` と `.html` の両方**を `present_files` で提示（`.html` を先頭に）
+- 提示時に「`.md` を編集して『変換して』と送れば HTML を再生成できます」と一言添える
+  （エントリポイント B）
 
 ### 5-B. 品質検証（Phase 5）
 

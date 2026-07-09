@@ -6,18 +6,20 @@
  * 依存: なし（単独で動作。base-template.html の #palette-dropdown /
  *       [data-palette-opt] ボタン群を参照する）
  *
- * 設計原則（v0.6.1 で明文化）:
- *   1. パレット値は許可リスト（PALETTES）で照合し、未知の値は既定値
- *      （ocean）へフォールバックする。localStorage は同一オリジンで
- *      共有されるため、パレット数が異なる別バージョンの生成デッキで
- *      保存された値が流れ込んでも壊れないようにする（Phase 3 の
- *      パレット増強時の後方互換の要）。
+ * 設計原則:
+ *   1. パレット値は許可リスト（PALETTES）で照合し、未知の値は既定値へ
+ *      フォールバックする。
  *   2. is-active クラスは [data-palette-opt] を持つ全ボタンに対して
- *      毎回同期する（トグルの取りこぼしによる二重ハイライトを防ぐ）。
- *   3. localStorage キーは 'slide-palette'（theme-toggle.js の
- *      'slide-theme' / view-toggle.js の 'slide-view' と同じ命名規約）。
- *   4. ドロップダウンの開閉は export-menu と同じ規約：hidden 属性の
- *      付け外しのみ・外側クリックと Escape で閉じる・アニメーションなし。
+ *      毎回同期する。
+ *   3. localStorage キーは「デッキ別」（'slide-palette::' + document.title）。
+ *      これにより、MD frontmatter の palette 指定（<html data-palette> 焼き込み）と
+ *      保存値の優先順位を「初回表示は frontmatter 優先・このデッキで操作した後は
+ *      その保存値優先」にできる。別デッキの選択が流れ込むことも構造的になくなる。
+ *      （〜v0.6.x の共有キー 'slide-palette' は新デッキでは参照しない。
+ *        旧デッキは旧 JS を内蔵しているため影響なし＝自己完結）
+ *   4. 未知値のフォールバック先は「そのデッキの焼き込み値（あれば）→ ocean」。
+ *   5. ドロップダウンの開閉は export-menu と同じ規約（hidden 属性・外側クリック/
+ *      Escape で閉じる）。
  */
 
 /* ==========================================================================
@@ -25,21 +27,29 @@
  * ========================================================================== */
 
 const PALETTES = ['ocean', 'forest', 'sunset', 'plum', 'graphite'];
-const PALETTE_STORAGE_KEY = 'slide-palette';
-const PALETTE_DEFAULT = 'ocean';
+
+/* デッキ生成時に frontmatter palette があれば <html data-palette="..."> が
+ * 焼き込まれている。読み込み時点の値を「このデッキの既定」として捕捉する。 */
+const PALETTE_DOC_DEFAULT = (function () {
+  const d = document.documentElement.dataset.palette;
+  return PALETTES.includes(d) ? d : 'ocean';
+})();
+
+/* デッキ別 localStorage キー */
+const PALETTE_STORAGE_KEY = 'slide-palette::' + (document.title || 'slides');
 
 /* ==========================================================================
  * 2. パレットの適用
  * ========================================================================== */
 
 /**
- * パレットを適用し、localStorage に保存する。
- * 未知の値が渡された場合は既定値（ocean）にフォールバックする。
+ * パレットを適用し、このデッキの localStorage に保存する。
+ * 未知の値が渡された場合はデッキ既定（焼き込み値→ocean）にフォールバックする。
  *
  * @param {string} name - パレット名（'ocean' | 'forest' | 'sunset' | 'plum' | 'graphite'）
  */
 function setPalette(name) {
-  const palette = PALETTES.includes(name) ? name : PALETTE_DEFAULT;
+  const palette = PALETTES.includes(name) ? name : PALETTE_DOC_DEFAULT;
   document.documentElement.dataset.palette = palette;
   updatePaletteActive(palette);
   try { localStorage.setItem(PALETTE_STORAGE_KEY, palette); } catch (e) {}
@@ -47,7 +57,6 @@ function setPalette(name) {
 
 /**
  * ドロップダウン内の選択中表示（is-active）を同期する。
- * [data-palette-opt] を持つ全ボタンを走査し、選択中のみ is-active を付与。
  *
  * @param {string} palette - 現在適用中のパレット名
  */
@@ -61,41 +70,25 @@ function updatePaletteActive(palette) {
  * 3. パレットメニュー（ドロップダウン）のトグル制御
  * ========================================================================== */
 
-/**
- * パレットメニューを開閉する。
- * #palette-dropdown の hidden 属性をトグルするだけのシンプルな実装。
- */
 function togglePaletteMenu() {
   const dropdown = document.getElementById('palette-dropdown');
   if (dropdown) dropdown.toggleAttribute('hidden');
 }
 
-/**
- * パレットメニューを強制的に閉じる。
- * メニュー内のボタンをクリックした後の自動クローズに使う。
- */
 function closePaletteMenu() {
   const dropdown = document.getElementById('palette-dropdown');
   if (dropdown) dropdown.setAttribute('hidden', '');
 }
 
 /* ==========================================================================
- * 4. 外側クリックでメニューを閉じる
+ * 4. 外側クリック / Escape でメニューを閉じる
  * ========================================================================== */
 
-/**
- * .palette-menu の外側をクリックしたらメニューを閉じる。
- * export-pdf.js の export-menu 用ハンドラとは独立して動作する。
- */
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.palette-menu')) {
     closePaletteMenu();
   }
 });
-
-/* ==========================================================================
- * 5. Escape キーでメニューを閉じる
- * ========================================================================== */
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
@@ -108,21 +101,23 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ==========================================================================
- * 6. 初期化：保存済みパレットを復元
- * ========================================================================== */
-
-/**
- * localStorage の保存値を復元する。未知値ガードは setPalette() 側に集約。
- * 保存値がない場合は data-palette を付与せず :root の既定（ocean 相当）の
- * まま表示し、is-active 表示だけ既定値に同期する。
+ * 5. 初期化
+ * ==========================================================================
+ * 優先順位:
+ *   (1) このデッキの localStorage 保存値（＝ユーザーがこのデッキで操作済み）
+ *   (2) <html data-palette> の焼き込み値（＝MD frontmatter の指定）
+ *   (3) ocean（既定）
  */
 (function initPalette() {
   try {
     const saved = localStorage.getItem(PALETTE_STORAGE_KEY);
-    if (saved) {
+    if (saved && PALETTES.includes(saved)) {
       setPalette(saved);
-    } else {
-      updatePaletteActive(PALETTE_DEFAULT);
+      return;
     }
   } catch (e) {}
+  /* 保存値なし → 焼き込み値（なければ ocean）を表示に反映。
+   * ここでは localStorage に書かない（「操作した」ときだけ保存する）。 */
+  document.documentElement.dataset.palette = PALETTE_DOC_DEFAULT;
+  updatePaletteActive(PALETTE_DOC_DEFAULT);
 })();

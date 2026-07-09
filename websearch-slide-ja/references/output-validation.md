@@ -27,7 +27,7 @@
 | 6 | 出典リンク | 最終スライドに `<a href=` が存在するか | PASS/WARN |
 | 7 | CSS/JSリーク | `<style>`/`<script>` 外にCSS定義・JS定義が漏れていないか | PASS/FAIL |
 | 8 | テンプレート残留 | `{TITLE}` `{SOURCE}` 等の未置換プレースホルダ | PASS/FAIL |
-| 9 | 禁止ライブラリ | Chart.js / D3.js / ECharts / `<canvas>` の参照 | PASS/FAIL |
+| 9 | 禁止ライブラリ | Chart.js / D3.js / ECharts / mermaid.js / `<canvas>` の参照 | PASS/FAIL |
 
 ### JS 構文チェック（項目4）について
 

@@ -3,6 +3,42 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.6.3] - 2026-07-09
+
+### 改善｜パレットメニューUIの左揃え・絵文字アイコン化
+
+カラーパレット切替メニューの見た目を改善（色数・機能・JSは変更なし）。
+
+- 左揃えに変更、丸いカラースワッチを絵文字（🌊🌲🌅🍇⬛）に置換
+- 各項目の文字色をそのパレット固有色に（選択中の背景色・文字色は現行どおり維持）
+- `.palette-swatch` / `.swatch-*` の定義を廃止
+
+パレット10色化は見送り。現行5色で主要な印象を過不足なくカバーしているため。将来は感情色ではなく役割ベース色（情報・注意・エラー等）を検討する。
+
+### 修正｜画像埋め込み時の非画像ファイル誤埋め込みを防止
+
+「画像部分でエラーが起きることがある」という報告を調査し、`<img>` に PDF 等の非画像ファイルの URL が混入する不具合を発見・修正。
+
+- `image-embedding.md` の埋め込み判断フローに「ファイル形式」チェックを追加（`.pdf` `.doc(x)` `.ppt(x)` `.xls(x)` `.zip` `.html` 等を除外）
+- `validate-output.sh` に新カテゴリ「画像形式チェック」を追加し、生成HTML内の全 `<img src>` を機械的に検査
+
+### 検証（リリース前確認済み）
+
+- パレットUI: ライト/ダーク両テーマの表示確認、CSS特異度の検証、`validate-output.sh` は無修正で ALL PASS
+- 画像形式チェック: 実際に問題のあったデッキで混入PDFを正しく検出（誤検知なし）。拡張子なしCDN URL等での誤検知テストも実施
+- 両適用スクリプトとも冪等性を確認（2回目実行で全SKIP）
+
+### ファイル構成の変更
+
+```
+変更:
+  websearch-slide-ja/assets/styles/nav-controls.css
+  websearch-slide-ja/assets/base-template.html
+  websearch-slide-ja/references/image-embedding.md
+  websearch-slide-ja/assets/scripts/validate-output.sh
+```
+
+---
 ## [v0.6.2] - 2026-07-09
 
 ### 追加｜新テンプレート2種（feature-showcase / comparison-chart）

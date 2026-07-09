@@ -3,6 +3,38 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.7.0] - 2026-07-09
+
+### 追加｜Markdown中間出力＋MD→HTML変換
+
+スライドの中間表現としてスライドMarkdown（スライドMD）を導入。生成時は `.md` と `.html` を両方出力し、編集した `.md` からHTMLを再生成できる。
+
+- **スライドMD仕様を新設**（`references/markdown-format.md`）: frontmatter（`title` / `palette`）、スライドディレクティブ（`<!-- slide: type -->`）、グラフの `chart` データ記述ブロック、図解の `diagram` ブロック／`mermaid` サブセット、変換規則、HTML→MD逆抽出規則
+- **ワークフローを2段化**: Step 4 を「4-A スライドMD生成 → 4-B MD→HTML変換」に再構成。スライドMD が Single Source of Truth（正）で、HTMLはMDから毎回フル再生成
+- **エントリポイントを3系統に**: A) テーマ依頼（従来）／B) スライドMD添付＋「変換して」（検索スキップ）／C) スライドHTML添付＋「MDにして」（逆抽出）
+- **Step 5 を両出力に**: `.md` と `.html` の両方を提示
+- **description にトリガー追加**: 「MDをスライドに変換」等で起動。`url-to-md` / `pdf-to-md-ja` との競合を避けるネガティブ設計（汎用Markdown変換用途は対象外と明記）
+- **Mermaid はサブセット限定＋インラインSVG変換**: `graph LR`（ノード5以下）／`graph TD`（4層以下）／循環（4以下）に対応。対応外は表・テキストにフォールバック。`mermaid.js` 等の外部ライブラリは最終HTMLに含めない（自己完結原則を維持）
+- **palette-toggle.js を更新**: localStorageキーをデッキ別化し、「初回表示はMDのfrontmatter指定を優先、操作後はそのデッキの保存値を優先」を実現
+- **validator に mermaid.js 読み込み検出を追加**: [9]禁止ライブラリチェックを拡張。単語の言及・コメントは誤検出せず、CDN/スクリプト読み込みのみ検出
+
+### ファイル構成の変更
+
+```
+追加:
+  scripts/apply-v070-fixes.sh
+  websearch-slide-ja/references/markdown-format.md
+  websearch-slide-ja/references/example-outputs/example-md-conversion.md
+  websearch-slide-ja/references/example-outputs/example-md-conversion.html
+変更:
+  websearch-slide-ja/SKILL.md
+  websearch-slide-ja/assets/scripts/palette-toggle.js   （palette-toggle-v070.js でフル置換）
+  websearch-slide-ja/assets/scripts/validate-output.sh
+  websearch-slide-ja/references/output-validation.md
+  websearch-slide-ja/references/example-outputs/README.md
+```
+
+---
 ## [v0.6.3] - 2026-07-09
 
 ### 改善｜パレットメニューUIの左揃え・絵文字アイコン化

@@ -3,7 +3,31 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
-## [v0.7.1] - 2026-07-09
+## [v0.7.2] - 2026-07-11
+
+### 改善｜Step 0 を作成目的のヒアリングに拡充
+
+スライド資料の作成意思確認にとどまらず、「誰を、どこへ動かしたいか」という作成目的を確認し、構成・トーンを最適化するステップに拡充。
+
+- **Step 0 を逐次2回のヒアリングに拡充**: 呼び出し1（作成する／やめる）→ 呼び出し2（自己学習・振り返り用／社内共有・勉強会用／SNS発信・顧客プレゼン用／おまかせ、の4択）。`ask_user_input_v0` の1問あたり2〜4択の制約に対応しつつ、従来の「やめる」機能は完全に維持
+- **目的別トーン定義を新設**（`references/audience-purpose.md`）: 目的ごとに「強調する階層・説得のレバー・引き算方針・推奨レイアウト・トーン」を定義。中身9割・見た目1割、ワンスライド・ワンメッセージ、ネクストアクションの明示など共通原則も明記
+- **Phase5（多様な入力）と連携した目的推定**: 会話履歴・長文・CSV等が既にある場合、経緯を解析して目的を推定し、確認時に推奨として提示（勝手に決めず必ず確認）
+- **後方互換**: 目的が未選択（おまかせ）でも、従来に近い中庸トーン（社内共有相当）で動作
+- frontmatterに `purpose:` キーを追加（任意）。再変換時にトーンを保持
+
+### ファイル構成の変更
+
+```
+追加:
+  websearch-slide-ja/references/audience-purpose.md
+変更:
+  websearch-slide-ja/SKILL.md
+  websearch-slide-ja/references/markdown-format.md
+  websearch-slide-ja/references/slide-layouts.md
+```
+
+---
+## [v0.7.1] - 2026-07-10
 
 ### 追加｜レイアウトバリアントと多様な入力の受け入れ
 
@@ -25,7 +49,6 @@
 
 ```
 追加:
-  scripts/apply-v071-fixes.sh
   websearch-slide-ja/references/example-outputs/example-layout-variants.html
 変更:
   websearch-slide-ja/SKILL.md
@@ -53,7 +76,6 @@
 
 ```
 追加:
-  scripts/apply-v070-fixes.sh
   websearch-slide-ja/references/markdown-format.md
   websearch-slide-ja/references/example-outputs/example-md-conversion.md
   websearch-slide-ja/references/example-outputs/example-md-conversion.html
@@ -157,7 +179,6 @@
 
 ```
 追加:
-  scripts/apply-v061-fixes.sh
   websearch-slide-ja/assets/scripts/palette-toggle.js
 変更:
   README.md

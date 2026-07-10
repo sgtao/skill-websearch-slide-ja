@@ -3,6 +3,37 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.7.1] - 2026-07-09
+
+### 追加｜レイアウトバリアントと多様な入力の受け入れ
+
+**レイアウトバリアント**: MDディレクティブの `layout:` キーで見た目のバリエーションを指定できるように（v0.7.0で予約していたキーを有効化）。
+
+- `two-col`（points/summary の2カラム化）／`title-xl`（タイトル拡大）／`compact`（高密度化）を追加
+- `<!-- slide: points, layout: two-col -->` のように指定。type自体の意味・データ構造は変えず見た目のみ変更
+- スタイル変更の対話フローを追加: 「3枚目を2カラムにして」→ 該当ディレクティブへ `layout:` を追記して再変換。曖昧な指示は選択式で確認
+- バリアントCSSはデッキ側 `<style>` 末尾に追記する既存方式を踏襲し、骨格CSSの統合順は不変
+
+**多様な入力の受け入れ**: スライドMD以外の入力（未準拠Markdown・会話履歴・プレーンテキスト・CSV）も受け付け、想定様式に変換して確認するフローを新設。
+
+- **入力タイプを自動判定**: 完全なスライドMD（frontmatter＋directive揃い）は直接変換、それ以外は変換確認フローへ。「frontmatterはあるがdirectiveが無い」場合は安全側に倒し未準拠扱い
+- **変換確認フロー**: 想定様式のスライドMDへ変換し、**全文を提示して承認**を得てからHTML生成。1スライドの分量はユーザー指定がなければ「情報グループ優先」（見出し単位で自然分割）
+- CSVは数値列があればグラフ候補として構造化。出典は「ユーザー提供データ」と明記し、既存の数値・単位・出典ルールに準拠
+- エントリポイントを新設（D: 未準拠Markdown／CSV／会話履歴・プレーンテキスト）
+
+### ファイル構成の変更
+
+```
+追加:
+  scripts/apply-v071-fixes.sh
+  websearch-slide-ja/references/example-outputs/example-layout-variants.html
+変更:
+  websearch-slide-ja/SKILL.md
+  websearch-slide-ja/references/slide-layouts.md
+  websearch-slide-ja/references/markdown-format.md
+```
+
+---
 ## [v0.7.0] - 2026-07-09
 
 ### 追加｜Markdown中間出力＋MD→HTML変換

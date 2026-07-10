@@ -280,6 +280,64 @@ Slide N   : 参考リンク・出典
 
 ---
 
+## レイアウトバリアント
+
+スライドディレクティブに `layout:` キーを付与すると、同一 type 内で見た目のバリエーションを選べる。
+type 自体の意味・データ構造は変えない（見た目のみを変更）。
+
+```markdown
+<!-- slide: points, layout: two-col -->
+<!-- slide: title, layout: title-xl -->
+<!-- slide: points, layout: compact -->
+```
+
+| layout 値 | 適用可能な type | 効果 |
+|---|---|---|
+| （なし・既定） | 全 type | 現行の標準レイアウト |
+| `two-col` | points / summary | 1列の箇条書きを2カラムに分割（項目数が多いとき） |
+| `title-xl` | title | 大見出しをさらに拡大、余白を広げる |
+| `compact` | points / table / summary | 行間・余白を詰めて情報密度を上げる |
+
+未知の `layout:` 値は無視して既定レイアウトにフォールバックする（エラーにしない）。
+
+### two-col（HTML実装のポイント）
+
+```html
+<ul class="points layout-two-col">
+  <li>...</li>
+  <li>...</li>
+</ul>
+```
+```css
+.layout-two-col { columns: 2; column-gap: 2rem; }
+.layout-two-col li { break-inside: avoid; }
+```
+
+### title-xl（HTML実装のポイント）
+
+```html
+<div class="slide-inner layout-title-xl">
+  <h1>...</h1>
+</div>
+```
+```css
+.layout-title-xl h1 { font-size: 3.2rem; }
+.layout-title-xl { padding: 64px 88px; }
+```
+
+### compact（HTML実装のポイント）
+
+```html
+<ul class="points layout-compact">...</ul>
+```
+```css
+.layout-compact li { padding: 0.15em 0; font-size: 0.88rem; }
+.layout-compact .slide-inner { gap: 0.3rem; }
+```
+
+**注**: 上記CSSはデッキ側 `<style>` 末尾に追記する（骨格CSSの統合順は不変。既存のコンテンツCSS方式を踏襲）。
+
+
 ## スライド選択ガイド
 
 | 情報の種類 | 推奨レイアウト |

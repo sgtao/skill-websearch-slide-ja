@@ -34,6 +34,7 @@ palette: ocean
 |---|---|---|---|
 | `title` | ✅ | 文字列 | `<title>` とファイル名の元。HTML では `{title} | Slides` になる |
 | `palette` | — | ocean / forest / sunset / plum / graphite | 初期パレット。省略時 ocean。不正値は ocean 扱い |
+| `purpose` | — | self-study / team-share / outreach | 作成目的。省略時は目的未選択扱い（`audience-purpose.md` の中庸トーン） |
 
 `palette` を指定した場合、変換時に `<html data-palette="...">` として焼き込み、
 ドロップダウンの該当ボタンに `is-active` を付ける。

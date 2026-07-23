@@ -3,6 +3,52 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.8.0] - 2026-07-23
+
+### 追加｜mdss-convert委譲をプリフライト方式に、レガシー生成を恒久フォールバックに
+
+Step 4の直前にCLI環境診断（Step 4-0）を新設し、`mdss-convert`の利用可否・対応オプションを
+`--help`の出力から都度検出してからHTML生成に進むよう変更。スキル側にCLIの特定バージョンの
+仕様を固定しないため、mdss-convertが将来機能追加・変更されてもスキルの改修なしに追従できる。
+
+CLIが利用できない環境では、従来のLLM直接生成（v0.7.3相当・`assets/`一式）にフォールバックする。
+このフォールバックは移行措置ではなく恒久機能とし、生成されるスライドの仕様がCLIトラックと
+異なることを許容する。
+
+- **Step 4-0（新設）**：`--help`の出力を対象オプションでgrepし、対応可否を会話内でキャッシュ。
+  未知オプションを本番コマンドに付けて試行錯誤しない設計（実機確認: 未知フラグは`exit 2`で
+  変換自体が失敗するため、実行して試すのではなく`--help`の照合だけで判定する）
+- `--print-spec`が使える場合、スライドMD仕様をCLIから都度取得（実効仕様）して`Step 4-A`で使用。
+  非対応の場合は同梱の`references/markdown-format.md`（v0.7.0）をそのまま使用する。
+  この仕様書のchart-donut／comparison-chart／diagram-flow記法がmdss-convert（v0.4.2時点）に
+  warnings 0件・lint 0件で通ることを実機確認済みのため、**ファイルは変更していない**
+- `--strict`が使える場合はそれを使用。使えない場合は`--json`のlint配列を手動解析して同等の
+  安全性（lint errorがあればHTML未提示・MD修正を促す）を確保
+- エントリポイントC（HTML→MD逆抽出）：`--extract-md`が使え、対象HTMLがmdss-convert生成物なら
+  推論不要で完全復元。それ以外は従来のLLM逆抽出（`markdown-format.md` §7）にフォールバック
+- CLIのバージョンは`npx -y mdss-convert@latest`とし、特定バージョンへの固定はしない
+  （プリフライトの機能検出が将来のオプション変更を吸収するため）
+- Step 5-B（品質検証）・クオリティチェックリストの一部項目（H・J）をトラック別に注記。
+  CLIトラックでは`validate-output.sh`によるHTML実装チェックは対象外（構造的に保証済みのため）
+- `assets/`・`design-tokens.md`・`export-recipes.md`等のレガシー実装リファレンスは
+  **撤去せず維持**（レガシートラックの実行に恒久的に必要なため）
+
+### ファイル構成の変更
+
+```
+新規:
+  websearch-slide-ja/references/cli-conversion.md
+変更:
+  websearch-slide-ja/SKILL.md
+  README.md
+維持（変更なし）:
+  websearch-slide-ja/references/markdown-format.md
+  websearch-slide-ja/assets/**
+  websearch-slide-ja/references/{design-tokens,export-recipes,output-validation,
+    slide-layouts,chart-generation,diagram-generation}.md
+```
+
+---
 ## [v0.7.2] - 2026-07-11
 
 ### 改善｜Step 0 を作成目的のヒアリングに拡充

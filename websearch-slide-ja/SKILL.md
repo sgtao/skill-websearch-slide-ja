@@ -25,6 +25,7 @@ description: >
 2.   Web検索・情報収集
 3-0. ビジュアル化判定（グラフ / 図解）
 3.   スライド構成の設計
+4-0. CLI環境診断（プリフライト）★新設
 4.   HTMLスライド生成（エクスポート機能込み）
 5.   ファイル出力・提示・検証
 ```
@@ -35,10 +36,13 @@ description: >
 
 | 入力 | フロー |
 |---|---|
-| A) テーマの依頼（従来） | Step 0 → 1 → 2 → 3 → 4-A → 4-B → 5 |
-| B) スライドMD添付＋「変換して」 | 簡易確認 → Step 4-B → 5（Step 1〜3 と検索はスキップ） |
-| C) スライドHTML添付＋「MDにして」「編集して」 | 逆抽出（markdown-format.md §7）→ .md 提示 →（編集後）Step 4-B → 5 |
-| D) 未準拠Markdown／CSV／会話履歴・プレーンテキスト | 入力タイプ判定 → 変換確認フロー（B-2）→ Step 4-B → 5 |
+| A) テーマの依頼（従来） | Step 0 → 1 → 2 → 3 → 4-0 → 4-A → 4-B → 5 |
+| B) スライドMD添付＋「変換して」 | 簡易確認 → Step 4-0 → 4-B → 5（Step 1〜3 と検索はスキップ） |
+| C) スライドHTML添付＋「MDにして」「編集して」 | Step 4-0 → 逆抽出（`--extract-md` またはmarkdown-format.md §7。`cli-conversion.md` §5参照）→ .md 提示 →（編集後）Step 4-B → 5 |
+| D) 未準拠Markdown／CSV／会話履歴・プレーンテキスト | 入力タイプ判定 → 変換確認フロー（B-2）→ Step 4-0 → 4-B → 5 |
+
+Step 4-0 はいずれの経路でも会話内で一度だけ実行し、以降 4-A・4-B・逆抽出で結果を使い回す
+（詳細は `references/cli-conversion.md`）。
 
 B / C では `source-selection.md` のゲート群を通らず、Web検索も行わない。
 スライドMD の仕様は `references/markdown-format.md` を参照。
@@ -86,22 +90,23 @@ B / C では `source-selection.md` のゲート群を通らず、Web検索も行
 | `references/search-patterns/tech.md` | 技術系（エンジニア / EM / DS / デザイナー） |
 | `references/search-patterns/business.md` | ビジネス系（PM / 経営 / マーケ / 営業 / 財務 / コンサル / オペレーション / 人事） |
 | `references/search-patterns/specialist.md` | 専門職（法務 / 研究者 / 医療 / 教育者 / 学生 / ライター） |
-| `references/slide-layouts.md` | Step 3 構成設計、Step 4 各スライド作成時 |
-| `references/markdown-format.md` | Step 4-A/4-B・HTML→MD逆抽出時：スライドMDの仕様 |
-| `references/audience-purpose.md` | Step 0 目的確認後・Step 3/4：目的別トーン（強調階層・説得レバー） |
-| `references/design-tokens.md` | Step 4：CSS変数・カラー埋め込み |
-| `references/image-embedding.md` | Step 2 画像収集、Step 4 画像埋め込み |
-| `references/chart-generation.md` | Step 3-0 グラフ化判定、Step 4 グラフ埋め込み |
-| `references/diagram-generation.md` | Step 3-0 図解判定、Step 4 図解（インラインSVG）埋め込み |
-| `references/export-recipes.md` | Step 4：エクスポート機能（PDF/PNG/ZIP）組み込み |
-| `references/output-validation.md` | Step 5：品質検証・修正確認 |
+| `references/cli-conversion.md` | **Step 4-0・4-B・逆抽出**：CLI診断アルゴリズム・コマンド組み立て・トラック分岐 |
+| `references/slide-layouts.md` | Step 3 構成設計、[レガシー] Step 4 各スライド作成時 |
+| `references/markdown-format.md` | Step 4-A（`--print-spec`非対応時の実効仕様）・HTML→MD逆抽出時：スライドMDの仕様。[レガシー]トラックでは必読 |
+| `references/audience-purpose.md` | Step 0 目的確認後・Step 3/4：目的別トーン（強調階層・説得レバー）。両トラック共通 |
+| `references/design-tokens.md` | [レガシー] Step 4：CSS変数・カラー埋め込み |
+| `references/image-embedding.md` | Step 2 画像収集、[レガシー] Step 4 画像埋め込み |
+| `references/chart-generation.md` | Step 3-0 グラフ化判定、[レガシー] Step 4 グラフ埋め込み |
+| `references/diagram-generation.md` | Step 3-0 図解判定、[レガシー] Step 4 図解（インラインSVG）埋め込み |
+| `references/export-recipes.md` | [レガシー] Step 4：エクスポート機能（PDF/PNG/ZIP）組み込み |
+| `references/output-validation.md` | [レガシー] Step 5：品質検証・修正確認 |
 | `references/example-outputs/README.md` | Step 3 構成設計：テーマ傾向が近いお手本の構成スケルトンを参照（実HTMLは原則開かない／トークン肥大防止） |
-| `assets/base-template.html` | Step 4 開始時に必ずコピーして土台にする |
-| `assets/styles/*.css` | 全 8 ファイルを統合（theme-vars → slide-core → nav-controls → figure → chart → diagram → list-view → print） |
-| `assets/scripts/*.js` | 全 7 ファイルを統合（fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png → palette-toggle） |
-| `assets/fallback-image.html` | 画像埋め込み時に `createFallback()` をコピー |
-| `assets/chart-templates/*.svg` | グラフ埋め込み時に該当テンプレートをコピー |
-| `assets/scripts/validate-output.sh` | Step 5：生成 HTML の機械的チェック |
+| `assets/base-template.html` | [レガシー] Step 4 開始時に必ずコピーして土台にする |
+| `assets/styles/*.css` | [レガシー] 全 8 ファイルを統合（theme-vars → slide-core → nav-controls → figure → chart → diagram → list-view → print） |
+| `assets/scripts/*.js` | [レガシー] 全 7 ファイルを統合（fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png → palette-toggle） |
+| `assets/fallback-image.html` | [レガシー] 画像埋め込み時に `createFallback()` をコピー |
+| `assets/chart-templates/*.svg` | [レガシー] グラフ埋め込み時に該当テンプレートをコピー |
+| `assets/scripts/validate-output.sh` | [レガシー] Step 5：生成 HTML の機械的チェック（CLIトラックはlintで代替。§Step 5-B参照） |
 
 > **CSS/JS 統合順の Single Source of Truth（SSoT）は本表と Step 4 の生成手順。**
 > assets/ 配下の各 CSS/JS のヘッダーコメントや他の references には統合順を再掲しない。
@@ -364,15 +369,38 @@ Slide N     : 参考リンク・出典 URL 一覧
 
 ## Step 4: スライド生成（MD中間層）
 
-> 生成は「4-A: スライドMD生成 → 4-B: MD→HTML変換」の2段構成。
+> 生成は「4-0: CLI環境診断 → 4-A: スライドMD生成 → 4-B: MD→HTML変換」の3段構成。
 > スライドMD が Single Source of Truth（正）であり、HTML は MD から毎回フル再生成する。
-> LLM変換方式のため、再生成のたびに細部（余白・座標・文言）が揺れうる（仕様）。
-> エントリポイント B（MD添付）では 4-A をスキップして 4-B から実行する。
+> エントリポイント B（MD添付）では 4-0 → 4-B の順で実行する（4-A はスキップ）。
+
+このスキルは **CLIトラック**（`mdss-convert`に変換を委譲）と **レガシートラック**
+（従来どおりLLMが直接HTMLを生成）の2経路を持つ。どちらが使われるかは Step 4-0 の診断結果で
+決まり、経路によって Step 4-A・4-B の具体的な手順が変わる。詳細な判定ロジックとコマンド組み立ては
+`references/cli-conversion.md` を参照。
+
+### Step 4-0: CLI環境診断（プリフライト）
+
+Step 4-A に入る前に、この会話内でまだ診断していなければ必ず実行する（詳細は
+`references/cli-conversion.md` §2）。
+
+1. `mdss-convert`（グローバル）または `npx -y mdss-convert@latest` が使えるか確認する
+2. 使える場合、`--help` の出力から対応オプション（`--print-spec` / `--strict` /
+   `--json-only` / `--extract-md` 等）を確認する
+3. 判定結果（利用可否・対応オプション一覧）は会話内で保持し、以降 Step 4-B を
+   複数回実行しても再診断しない
+4. 利用不可の場合は「今回はCLIが利用できないため、従来方式で作成します」と一言添え、
+   以降はレガシートラック（本ステップの [レガシー] 表記の手順）で進める
 
 ### Step 4-A: スライドMD生成
 
-`references/markdown-format.md` の仕様で、Step 3 の構成スケルトンを `.md` に書き起こす。
+Step 3 の構成スケルトンを `.md` に書き起こす。使用する仕様は Step 4-0 の結果で決まる。
 
+- **CLIトラック かつ `--print-spec` 対応**: `mdss-convert --print-spec` の出力（最新の
+  スライドMD記法）にそのまま従う。`references/markdown-format.md` は使わない
+- **上記以外（CLIトラックで`--print-spec`非対応、または レガシートラック）**:
+  `references/markdown-format.md` に従う。この仕様書はレガシートラックのLLM生成にも、
+  CLIトラックの変換にもそのまま使える（chart-donut／comparison-chart／diagram-flowの記法が
+  mdss-convertでもwarnings 0件・lint 0件で通ることを確認済み）
 - frontmatter（`title` / `palette`）→ スライドディレクティブ（`<!-- slide: type -->`）→ 本文
 - グラフは `chart` データ記述ブロック（推奨）、図解は `diagram` ブロックまたは `mermaid`
   サブセット（変換時にインラインSVG化。`mermaid.js` は最終HTMLに含めない）
@@ -380,12 +408,22 @@ Slide N     : 参考リンク・出典 URL 一覧
 
 ### Step 4-B: MD→HTML変換
 
-スライドMD を入力に、以下の手順で HTML を生成する（従来の Step 4 本体）。
+```
+CLIトラック:
+  references/cli-conversion.md §4 のコマンド組み立てに従い、mdss-convert で変換する。
+  lintにerrorがあれば（--strict の exit 3、または --json のlint配列で判定）、
+  HTMLを提示せずMDを修正して再変換する
+
+レガシートラック [レガシー]:
+  以下の「生成手順」（本ステップ従来どおり）でLLMが直接HTMLを生成する
+```
+
 frontmatter `palette` があれば `<html data-palette="...">` を焼き込み、
-ドロップダウンの該当ボタンへ `is-active` を移す（markdown-format.md §6）。
+ドロップダウンの該当ボタンへ `is-active` を移す（`markdown-format.md` §6 / CLIトラックでは
+mdss-convert側が同等の処理を行う）。
 
 > 文言のトーン・強調・ネクストアクションは、Step 0 で確認した作成目的
-> （`references/audience-purpose.md`）に従う。
+> （`references/audience-purpose.md`）に従う。両トラック共通。
 
 ### スタイル変更の対話
 
@@ -393,11 +431,12 @@ frontmatter `palette` があれば `<html data-palette="...">` を焼き込み�
 
 1. 対象スライドを特定し、そのMDディレクティブに `layout:` を追記
    （例: `<!-- slide: points, layout: two-col -->`）
-2. MD→HTML再変換（Step 4-B）を実行
+2. MD→HTML再変換（Step 4-B。トラックはStep 4-0の診断結果をそのまま使い回し、再診断しない）
 3. 指示が曖昧なとき（「もっと見やすく」等）は `ask_user_input_v0` で
    「2カラム化 / タイトル拡大 / コンパクト化」を選択式提示する
 
-利用可能な `layout:` 値は `references/slide-layouts.md`「レイアウトバリアント」を参照。
+利用可能な `layout:` 値は、CLIトラックなら Step 4-A で取得した実効仕様、レガシートラックなら
+`references/slide-layouts.md`「レイアウトバリアント」を参照。
 
 
 ### デザイン原則
@@ -406,11 +445,13 @@ frontmatter `palette` があれば `<html data-palette="...">` を焼き込み�
 - アクセントカラー 1 色のみ（`--accent`）。5 パレット（ocean / forest / sunset / plum / graphite）を定義済みで、生成後に HTML 右上の 🎨 メニューで切替可能（生成時のデフォルト: ocean）
 - 文字中心・広い余白・箇条書き主体
 - スライドサイズ: 960×540px 固定（16:9）、`transform: scale()` でフィット
-- 詳細は `references/design-tokens.md`
+- 両トラック共通の見た目方針。詳細な実装（CSS変数の値等）は `references/design-tokens.md`
+  [レガシー]（CLIトラックではmdss-convert側が担うため参照不要）
 
 ### エクスポート機能
 
-生成 HTML は以下 3 種に対応。詳細は `references/export-recipes.md`。
+生成 HTML は以下 3 種に対応（両トラック共通）。レガシートラックの実装詳細は
+`references/export-recipes.md` [レガシー]。CLIトラックはmdss-convertが標準で備える。
 
 | 方式 | 起動 | 依存 | 自己完結性 |
 |------|------|------|-----------|
@@ -420,7 +461,10 @@ frontmatter `palette` があれば `<html data-palette="...">` を焼き込み�
 
 閲覧は完全自己完結、エクスポート時のみ CDN を動的ロード。`P` キー経由でも `Ctrl+P` 直接でも 1 ページ = 1 スライドになるよう `print.css` が hero モードを上書きする。
 
-### 生成手順
+### 生成手順 [レガシートラックのみ]
+
+**CLIトラックの場合は以下を一切行わない**（Step 4-BのCLIコマンド1回で完結する）。
+レガシートラックの場合のみ、以下の手順でLLMが直接HTMLを組み立てる。
 
 1. `assets/base-template.html` をコピーして土台にする
 2. `assets/styles/` の **8 ファイル**を `<style>` に統合（`theme-vars → slide-core → nav-controls → figure → chart → diagram → list-view → print` の順、print.css は必ず最後）
@@ -445,7 +489,9 @@ frontmatter `palette` があれば `<html data-palette="...">` を焼き込み�
 7. `assets/scripts/` の **7 ファイル**を `<script>` に統合（`fit-slide → theme-toggle → view-toggle → navigation → export-pdf → export-png → palette-toggle` の順）
 8. `.control-cluster` 内に `.export-menu` ブロックが含まれることを確認（base-template に標準で含まれている）。キーボードショートカット（P / Shift+S / Shift+P）は navigation.js 改修版に組み込み済み
 
-### 機能チェック表
+### 機能チェック表 [レガシートラックのみ]
+
+CLIトラックでは以下がmdss-convert側で構造的に保証されるため、チェック不要。
 
 | 機能 | 実装方法 |
 |------|---------|
@@ -478,9 +524,14 @@ frontmatter `palette` があれば `<html data-palette="...">` を焼き込み�
 
 ### 5-B. 品質検証（Phase 5）
 
-ユーザーが「品質を確認して」「検証して」「チェックして」と求めた場合、
-`references/output-validation.md` を参照して以下のフローを実行する。
+ユーザーが「品質を確認して」「検証して」「チェックして」と求めた場合、以下を実行する。
 検証は**ユーザーの明示的な要求時のみ**実行する（デフォルトでは実行しない）。
+
+**CLIトラックの場合**: `validate-output.sh` は対象外（レガシートラック向けのHTML実装
+チェックのため）。代わりに Step 4-B の `--strict`／lint 判定が既に構造的な検証を兼ねている。
+ユーザーには「CLI変換のためlintで検証済みです（warnings/lintの内容）」と結果を伝えて終了する。
+
+**レガシートラックの場合**: `references/output-validation.md` を参照して以下のフローを実行する。
 
 **検証フロー:**
 
@@ -516,6 +567,7 @@ frontmatter `palette` があれば `<html data-palette="...">` を焼き込み�
 - [ ] 検索する場合、検索フレーズ候補がユーザーに提示・承認されたか
 - [ ] ビジュアル方針（グラフ＋画像 / グラフのみ / テキストのみ）が確認されたか
 - [ ] 情報量不足・中止選択時に検索や HTML 生成が一切行われていないか
+- [ ] Step 4-0（CLI環境診断）が実行され、結果に応じたトラックでStep 4-A/4-Bが進んだか
 
 ### B. コンテンツ品質
 - [ ] Web検索から得た実際の情報が含まれているか（架空データ NG）
@@ -555,7 +607,7 @@ frontmatter `palette` があれば `<html data-palette="...">` を焼き込み�
 - [ ] CORS エラー / ネット切断時に alert でエラー通知が出るか
 - [ ] 印刷時にダークテーマがライトに上書きされ、コントロール類が非表示になるか
 
-### H. コンテンツ漏洩チェック
+### H. コンテンツ漏洩チェック [レガシートラックのみ。CLIトラックは型システムにより原理的に発生しないため対象外]
 - [ ] `<section>` / `<div class="slide-inner">` の直下に CSS 定義テキスト（`[data-theme="dark"]`、`var(--`、`:root {` 等）が表示されていないか
 - [ ] JavaScript コード断片（`function `、`const `、`document.`）がスライドの可視テキストとして漏れていないか
 - [ ] SVG テンプレートのプレースホルダー（`{TITLE}`、`{SOURCE}`、`{AXIS_X_LABEL}` 等）が未置換のまま残っていないか
@@ -564,7 +616,7 @@ frontmatter `palette` があれば `<html data-palette="...">` を焼き込み�
 - [ ] 10 行超のテーブルや 20 項目超の一覧を含むスライドに `slide-fit` クラスが付与されているか
 - [ ] `slide-fit` が通常の概要・メインコンテンツスライドに誤って付与されていないか
 
-### J. JS 構文の健全性
+### J. JS 構文の健全性 [レガシートラックのみ。CLIトラックはコンパイル済みJSを配布するため対象外]
 - [ ] `<script>` 内にエスケープシーケンス（`\n` 等）を含むコードを転記する際、実際の改行文字に化けていないか
 - [ ] JS/CSS ソースをテキストとして手で書き写さず、ファイル読み込み＋機械的な文字列結合で扱っているか
 - [ ] 生成直後に `validate-output.sh` の JS 構文チェック（項目4）が PASS するか（H節のリークチェックとは別に、構文そのものが壊れていないかを確認する）

@@ -41,6 +41,7 @@ Web検索で情報収集して、スライド形式のHTMLページを生成す�
 - **生成HTML品質チェックスクリプト（v0.4.0〜）**
   - `bash assets/scripts/validate-output.sh <file.html>` でHTML構文・必須要素・CSS/JSリーク等を9カテゴリ自動検証
   - 「検証して」の指示で実行。FAILがある場合は修正するか確認してから対応
+- **CLI連携（自動検出）** — `mdss-convert`（[MD Slide Studio](https://github.com/sgtao/md-slide-studio)のCLI）が利用可能な環境では、HTML生成をCLIへ自動委譲し決定論的な変換を行う。CLIが使えない環境では、従来どおりLLMが直接HTMLを生成する（フォールバック）。どちらの経路になるかは実行時に自動判定され、特定バージョンへの依存はない
 
 ### このスキルが目指すもの
 

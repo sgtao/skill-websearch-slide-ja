@@ -3,6 +3,54 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.8.3] - 2026-11-11
+
+### 追加｜多様な環境へのインストール対応（`scripts/install.sh`）
+
+スキル本体（`websearch-slide-ja/`）は変更なし。インストール方法だけを広げた。
+
+- **`--target`**: 配置先のツールを選ぶ。`claude`（既定）/ `copilot` / `agents` / `antigravity` / `all`。
+  カンマ区切りで複数指定可
+- **`--scope`**: `user`（既定。ホームディレクトリ配下）/ `project`（ワークスペース配下）。
+  `project` の対象は実行時のカレントディレクトリで、`--project-dir` で変更できる。
+  スキルのリポジトリ自身を対象にした場合は誤操作としてエラーにする
+- **`--dir`**: 任意の配置先を直接指定する
+- **`--uninstall`**: 配置先からスキルを削除する（`-y` が無ければ確認する）
+- **`--dry-run`**: 何も書き込まず、行う操作だけを表示する
+- **`--list-targets`**: ツール × スコープの配置先一覧を表示する
+- コピー後に配置先の `.DS_Store` を取り除く
+- 引数なし・`-y`・`--zip`・`CLAUDE_SKILLS_DIR` の動作は従来どおり（`-y` の結果が改修前と一致することを確認）
+- macOS 標準の bash 3.2 で動作する（連想配列・`mapfile` 不使用）
+
+| ツール | `--scope project` | `--scope user` |
+|---|---|---|
+| `claude` | `.claude/skills/` | `~/.claude/skills/` |
+| `copilot` | `.github/skills/` | `~/.copilot/skills/` |
+| `agents` | `.agents/skills/` | `~/.agents/skills/` |
+| `antigravity` | `.agents/skills/` | `~/.gemini/config/skills/` |
+
+### 変更｜README の「インストール」を書き直し
+
+- ツール × スコープの配置先一覧、`scripts/install.sh` の使い方、`npx skills add`（skills.sh の CLI）の
+  使い方、Claude.ai への ZIP 登録を記載
+- `npx skills add` は本リポジトリの構成のままで使える（skills CLI v1.8.1 で、GitHub の URL 指定と
+  ローカルパス指定の両方でスキルが検出されることを確認）。リポジトリ構成は変更していない
+
+### 未確認
+
+- Claude 以外のツール（GitHub Copilot / Codex / Antigravity）でスキルが期待どおり動くかは未確認。
+  本文は Claude.ai のツール名とパスを前提にしている（次の版で扱う）
+
+### ファイル構成の変更
+
+```
+変更:
+  README.md
+  CHANGELOG
+  scripts/install.sh
+```
+
+---
 ## [v0.8.2] - 2026-11-11
 
 ### 変更｜mdss-convert 最新版（v0.6.1）への追従

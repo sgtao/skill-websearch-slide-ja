@@ -70,11 +70,81 @@ CLI連携の操作は `mdss-convert` の版で変わることがあります。�
 
 ## インストール
 
-### for [Claude.ai](https://claude.ai/)
-スキルフォルダ`websearch-slide-ja`をZIPファイルにして、[カスタマイズ＞スキル](https://claude.ai/customize/skills)に追加してください。
+方法は 2 つあります。どちらも同じスキルフォルダ（`websearch-slide-ja/`）を配置します。
 
-### for Claude Code
-スキルフォルダごと `~/.claude/skills/` に配置してください。
+### 配置先の一覧
+
+| ツール | ワークスペース（リポジトリ）配下 | ユーザー（全プロジェクト共通） |
+|---|---|---|
+| Claude Code | `.claude/skills/` | `~/.claude/skills/` |
+| GitHub Copilot | `.github/skills/` | `~/.copilot/skills/` |
+| 標準（Codex など） | `.agents/skills/` | `~/.agents/skills/` |
+| Antigravity | `.agents/skills/` | `~/.gemini/config/skills/` |
+| [Claude.ai](https://claude.ai/) | — | ZIP を [カスタマイズ＞スキル](https://claude.ai/customize/skills) に登録 |
+
+GitHub Copilot は `.claude/skills/`・`.agents/skills/`・`~/.agents/skills/` も読み込みます。
+
+> インストールできることと、そのツールで期待どおり動くことは別です。本スキルは Claude（Claude.ai / Claude Code）で動作確認しています。他のツールでは、質問の出し方・ファイルの保存先・Web 検索の手段が異なる場合があります。
+
+### 方法 1: `scripts/install.sh`（このリポジトリを clone して使う）
+
+```bash
+git clone https://github.com/sgtao/skill-websearch-slide-ja.git
+cd skill-websearch-slide-ja
+
+bash scripts/install.sh                      # Claude Code・ユーザー（~/.claude/skills）
+bash scripts/install.sh --target copilot     # GitHub Copilot・ユーザー（~/.copilot/skills）
+bash scripts/install.sh --target all -y      # 4 つのツールすべて・確認なし
+bash scripts/install.sh --list-targets       # 配置先の一覧を表示
+```
+
+ワークスペース（リポジトリ）配下に入れるときは、入れたいプロジェクトで実行するか、`--project-dir` で指定します。
+
+```bash
+cd ~/work/my-app
+bash /path/to/skill-websearch-slide-ja/scripts/install.sh --scope project --target claude,copilot
+
+# または
+bash scripts/install.sh --scope project --project-dir ~/work/my-app --target copilot
+```
+
+| オプション | 内容 |
+|---|---|
+| `--target <list>` | `claude`（既定）/ `copilot` / `agents` / `antigravity` / `all`。カンマ区切りで複数指定可 |
+| `--scope <scope>` | `user`（既定）/ `project` |
+| `--project-dir <path>` | `--scope project` の対象（既定: 実行時のカレントディレクトリ） |
+| `--dir <path>` | 任意の配置先を直接指定（上表に無いツール向け） |
+| `--uninstall` | 配置先からスキルを削除する |
+| `--dry-run` | 何も書き込まず、行う操作だけを表示する |
+| `--zip` | Claude.ai 用の ZIP を `dist/` に生成する |
+| `-y`, `--yes` | 確認なしで実行する |
+
+- 既存の同名フォルダは、削除してからコピーします（古いファイルを残さないため）。`-y` を付けない場合は削除前に確認します
+- 環境変数 `CLAUDE_SKILLS_DIR` で、Claude Code・ユーザーの配置先を変更できます
+- macOS 標準の bash 3.2 で動作します
+
+### 方法 2: `npx skills add`（[skills.sh](https://skills.sh/) の CLI。clone 不要）
+
+```bash
+# プロジェクト配下に入れる（対話形式でツールを選ぶ）
+npx skills add https://github.com/sgtao/skill-websearch-slide-ja --skill websearch-slide-ja
+
+# ユーザー側（-g）に、ツールを指定して入れる
+npx skills add https://github.com/sgtao/skill-websearch-slide-ja --skill websearch-slide-ja -g -a claude-code
+```
+
+- `-a` には `claude-code` / `github-copilot` / `antigravity` / `codex` などを指定できます（複数可）
+- プロジェクト配下では、実体を `.agents/skills/` に置き、Claude Code 用の `.claude/skills/` からはシンボリックリンクになります。コピーにしたい場合は `--copy` を付けます
+- CLI は匿名の利用状況を送信します。止めるには `DISABLE_TELEMETRY=1` を付けて実行します
+- GitHub Copilot のプロジェクト配下は、`npx skills add` では `.agents/skills/` に入ります。`.github/skills/` に置きたい場合は方法 1 を使ってください
+
+### Claude.ai に登録する
+
+```bash
+bash scripts/install.sh --zip      # dist/websearch-slide-ja-<日時>.zip を生成
+```
+
+生成した ZIP を [カスタマイズ＞スキル](https://claude.ai/customize/skills) に追加してください（スキルフォルダ `websearch-slide-ja` を手で ZIP にしても同じです）。
 
 ## Language
 

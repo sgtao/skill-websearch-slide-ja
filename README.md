@@ -125,18 +125,46 @@ bash scripts/install.sh --scope project --project-dir ~/work/my-app --target cop
 
 ### 方法 2: `npx skills add`（[skills.sh](https://skills.sh/) の CLI。clone 不要）
 
-```bash
-# プロジェクト配下に入れる（対話形式でツールを選ぶ）
-npx skills add https://github.com/sgtao/skill-websearch-slide-ja --skill websearch-slide-ja
+Node.js（`npx`）があれば、リポジトリを clone せずにインストールできます。
 
-# ユーザー側（-g）に、ツールを指定して入れる
-npx skills add https://github.com/sgtao/skill-websearch-slide-ja --skill websearch-slide-ja -g -a claude-code
+```bash
+# 基本形（入れたいプロジェクトのフォルダで実行。対話形式でツールを選ぶ）
+npx skills add sgtao/skill-websearch-slide-ja --skill websearch-slide-ja
 ```
 
-- `-a` には `claude-code` / `github-copilot` / `antigravity` / `codex` などを指定できます（複数可）
-- プロジェクト配下では、実体を `.agents/skills/` に置き、Claude Code 用の `.claude/skills/` からはシンボリックリンクになります。コピーにしたい場合は `--copy` を付けます
+リポジトリは `owner/repo` の短縮形でも、URL（`https://github.com/sgtao/skill-websearch-slide-ja`）でも指定できます。
+
+```bash
+# 中身を確認するだけ（インストールしない）
+npx skills add sgtao/skill-websearch-slide-ja --list
+
+# ユーザー側（全プロジェクト共通）に、Claude Code 向けに入れる
+npx skills add sgtao/skill-websearch-slide-ja --skill websearch-slide-ja -g -a claude-code
+
+# プロジェクト配下に、複数のツール向けに確認なしで入れる
+npx skills add sgtao/skill-websearch-slide-ja --skill websearch-slide-ja -a claude-code -a github-copilot -y
+```
+
+| オプション | 内容 |
+|---|---|
+| `-s`, `--skill <name>` | 入れるスキル名（本リポジトリは `websearch-slide-ja` の 1 つ） |
+| `-g`, `--global` | ユーザー側に入れる（付けなければプロジェクト配下） |
+| `-a`, `--agent <id>` | 対象のツール。`claude-code` / `github-copilot` / `antigravity` / `codex` など（複数可） |
+| `-l`, `--list` | リポジトリ内のスキルを一覧表示するだけ |
+| `--copy` | シンボリックリンクではなくコピーで配置する |
+| `-y`, `--yes` | 確認なしで実行する |
+
+入れたあとの管理も同じ CLI で行えます。
+
+```bash
+npx skills list                          # インストール済みのスキルを一覧表示
+npx skills update websearch-slide-ja     # 最新版に更新
+npx skills remove websearch-slide-ja     # 削除
+```
+
+- プロジェクト配下では、実体を `.agents/skills/` に置き、Claude Code 用の `.claude/skills/` からはシンボリックリンクになります（`skills-lock.json` も作られます）。コピーにしたい場合は `--copy` を付けます
+- GitHub Copilot のプロジェクト配下は `.agents/skills/` に入ります。`.github/skills/` に置きたい場合は方法 1 を使ってください
 - CLI は匿名の利用状況を送信します。止めるには `DISABLE_TELEMETRY=1` を付けて実行します
-- GitHub Copilot のプロジェクト配下は、`npx skills add` では `.agents/skills/` に入ります。`.github/skills/` に置きたい場合は方法 1 を使ってください
 
 ### Claude.ai に登録する
 

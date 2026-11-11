@@ -1,4 +1,4 @@
-# CLI連携（mdss-convert）— 診断・変換・逆抽出（v0.8.2）
+# CLI連携（mdss-convert）— 診断・変換・逆抽出（v0.8.4）
 
 Step 2.5（診断・実効仕様の取得）・Step 4-A（MD生成）・Step 4-B（変換）・エントリポイントC（逆抽出）で参照する。
 **このスキルはmdss-convertの特定バージョンに依存しない。** 実行前に毎回「今何が使えるか」を
@@ -139,7 +139,7 @@ mdss-convert --sample-md -o <作業用の場所>/sample.md
 grep -n '<!-- slide: steps' <作業用の場所>/sample.md     # 行番号を調べ、そのスライド（次の --- まで）だけ読む
 ```
 
-出力先は成果物のフォルダではなく一時的な場所にし、ユーザーには提示しない。
+出力先は成果物のフォルダではなく一時ファイルの置き場（`environment.md` §1）にし、ユーザーには提示しない。
 
 ---
 
@@ -216,7 +216,7 @@ base = "mdss-convert"（グローバル導入時） または "npx -y mdss-conve
 
 1. 対象スライドのディレクティブに `layout:` を追記する（例: `<!-- slide: points, layout: two-col -->`）
 2. 上記コマンドで再変換する（Step 2.5の診断結果は使い回す。再診断しない）
-3. 指示が曖昧なとき（「もっと見やすく」等）は `ask_user_input_v0` で選択式提示する
+3. 指示が曖昧なとき（「もっと見やすく」等）は選択式で提示する（使うツールは `environment.md`）
 
 利用可能な `layout:` / `tone:` の値は、Step 2.5で取得した実効仕様（`--print-spec`の出力、
 または非対応時は`markdown-format.md`の記載範囲）に従う。

@@ -1,6 +1,6 @@
 # skill-websearch-slide-ja
 
-Web検索で情報収集して、スライド形式のHTMLページを生成するClaude.aiスキル。
+Web検索で情報収集して、スライド形式のHTMLページを生成するスキル（Agent Skills 形式）。Claude.ai と Claude Code で使えます。
 
 ## 使い方のトリガー例
 
@@ -84,7 +84,7 @@ CLI連携の操作は `mdss-convert` の版で変わることがあります。�
 
 GitHub Copilot は `.claude/skills/`・`.agents/skills/`・`~/.agents/skills/` も読み込みます。
 
-> インストールできることと、そのツールで期待どおり動くことは別です。本スキルは Claude（Claude.ai / Claude Code）で動作確認しています。他のツールでは、質問の出し方・ファイルの保存先・Web 検索の手段が異なる場合があります。
+> インストールできることと、そのツールで期待どおり動くことは別です。本スキルは Claude（Claude.ai / Claude Code）での利用を想定しています。質問の出し方・ファイルの保存先・検索の手段は環境ごとに異なるため、スキルは [`references/environment.md`](./websearch-slide-ja/references/environment.md) の読み替え表に従って動きます（v0.8.4〜）。Claude 以外のツールでは、選択式の質問ツールや Web 検索が無い場合の進め方も同じ表に定めていますが、動作は未確認です。
 
 ### 方法 1: `scripts/install.sh`（このリポジトリを clone して使う）
 

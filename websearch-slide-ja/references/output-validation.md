@@ -49,17 +49,14 @@
 
 ## スクリプト実行方法
 
-Claude Code 環境・ローカル環境での実行:
+スキルのフォルダを基準に、成果物のパスを渡して実行する。
 
 ```bash
-bash assets/scripts/validate-output.sh path/to/output.html
+bash assets/scripts/validate-output.sh <成果物の保存先>/{テーマ}-slides.html
 ```
 
-Claude.ai 環境での実行（bash_tool 経由）:
-
-```bash
-bash assets/scripts/validate-output.sh /mnt/user-data/outputs/{テーマ}-slides.html
-```
+成果物の保存先とシェルの実行手段は環境で異なる（`environment.md` §1）。
+シェルを実行できない環境では、このスクリプトは使えない（同 §3）。
 
 ---
 

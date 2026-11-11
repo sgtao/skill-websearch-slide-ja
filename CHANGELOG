@@ -3,6 +3,54 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.8.4] - 2026-11-11
+
+### 変更｜環境対応の明確化（Claude.ai と Claude Code の両立）
+
+スキル本文が Claude.ai のツール名（`ask_user_input_v0` / `present_files` / `image_search`）と
+保存先（`/mnt/user-data/outputs/`）を直接書いていたため、Claude Code など他の環境では
+読み替えが必要だった。本文を「操作の名前」で書き、読み替えを 1 か所にまとめた。
+生成されるスライドの内容・手順の順序は変更なし。
+
+- **`references/environment.md` を新規追加**: 選択式の確認／成果物の保存先／成果物の提示／
+  Web 検索／画像検索／シェル実行／スキル内ファイルの参照／一時ファイルの置き場について、
+  Claude.ai・Claude Code・その他（GitHub Copilot / Codex / Antigravity など）の読み替え表を定義
+- **手段が無いときの進め方を定義**: Web 検索が無い（会話のみで進めるか中止かを確認。検索した
+  ふりをしない）／画像検索が無い（画像収集をスキップ）／シェルが無い（レガシートラック）／
+  ファイルを保存できない（内容を本文に出力）
+- **質問のしかたを共通化**: 1 回 2〜4 択、前の回答に依存する質問はまとめない、選択式の
+  質問ツールが無い環境では番号付きの選択肢を本文に書いて返答を待つ
+- **保存の規則を追加**: 同名のファイルが既にある場合は上書きを確認する（同じ会話で自分が作った
+  ファイルの再生成は確認不要）。スキルのフォルダの中には成果物を保存しない
+- **SKILL.md**: 冒頭に「実行環境」の節を追加し、`environment.md` を開始時の必読にした。
+  本文からツール固有名とパスを外した（Step 0・1-A・1-C・2・4・5）
+- **`source-selection.md` / `cli-conversion.md` / `output-validation.md`**: 同様にツール固有名と
+  パスを外した。`source-selection.md` に残っていた「6〜10枚」の固定表記も、v0.8.2 の
+  トラック別の枚数に合わせて修正
+- **README**: 冒頭の説明と、インストールの節の注記を更新
+- **SKILL.md（共通記法）**: `point:` の帯の中にインラインコードを書かない、を追記
+  （mdss-convert v0.6.1 で文字が読めなくなることを、実行確認の撮影で見つけた）
+
+### 未確認
+
+- Claude.ai での動作（ZIP を登録しての確認）
+- Claude 以外のツールでの動作
+
+### ファイル構成の変更
+
+```
+新規:
+  websearch-slide-ja/references/environment.md
+変更:
+  README.md
+  CHANGELOG
+  websearch-slide-ja/SKILL.md
+  websearch-slide-ja/references/source-selection.md
+  websearch-slide-ja/references/cli-conversion.md
+  websearch-slide-ja/references/output-validation.md
+```
+
+---
 ## [v0.8.3] - 2026-11-11
 
 ### 追加｜多様な環境へのインストール対応（`scripts/install.sh`）

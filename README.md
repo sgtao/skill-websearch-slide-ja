@@ -39,7 +39,7 @@ Web検索で情報収集して、スライド形式のHTMLページを生成す�
   - 10行超テーブル・20項目超一覧を含むスライドで `slide-fit` クラスを自動付与
   - 一覧モード（`V`）切替時にコンテンツ全体を表示。hero モードの16:9固定は維持
 - **生成HTML品質チェックスクリプト（v0.4.0〜）**
-  - `bash assets/scripts/validate-output.sh <file.html>` でHTML構文・必須要素・CSS/JSリーク等を9カテゴリ自動検証
+  - `bash assets/scripts/validate-output.sh <file.html>` でHTML構文・必須要素・CSS/JSリーク・画像形式等を10カテゴリ自動検証
   - 「検証して」の指示で実行。FAILがある場合は修正するか確認してから対応
 - **CLI連携（自動検出）** — `mdss-convert`（[MD Slide Studio](https://github.com/sgtao/md-slide-studio)のCLI）が利用可能な環境では、HTML生成をCLIへ自動委譲し決定論的な変換を行う。CLIが使えない環境では、従来どおりLLMが直接HTMLを生成する（フォールバック）。どちらの経路になるかは実行時に自動判定され、特定バージョンへの依存はない
 

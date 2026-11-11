@@ -3,6 +3,49 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.8.1] - 2026-11-11
+
+### 修正｜ドキュメントと実体の不整合を解消
+
+機能追加・生成挙動の変更なし。文書の記載を実際のファイル・スクリプトに合わせた。
+
+- **検証カテゴリ数を「10」に統一**: `validate-output.sh` は v0.6.3 で「画像形式チェック」を追加して
+  10 カテゴリになっていたが、README と `output-validation.md` の一覧、スクリプト先頭のコメントが
+  9 のままだった。3 か所に 10 番目（画像形式）を追記
+- **お手本一覧を実在するファイルに合わせた**: `example-outputs/README.md` の一覧から、同梱されていない
+  3 例（example-feature-showcase / example-before-after / example-md-conversion）を削除。
+  これらの記法の実例は `mdss-convert --sample-md` を参照するよう案内を追記
+  （過去の項に記載のある `example-layout-variants.html` も同梱していない）
+- **`description` に対象外の記述を追加**: Web ページや PDF を Markdown に変換するだけの依頼
+  （スライド化を伴わないもの）は対象外と明記。v0.7.0 の項に「明記」とあったが実際には入っていなかった
+- **`markdown-format.md` 冒頭に位置づけを注記**: `--print-spec` が使えないとき・レガシートラック用の
+  仕様書（v0.7.0 時点）であることを明記。「変換は LLM が行う」はレガシートラックの説明であると主語を補った
+- **`output-validation.md`**: JS 構文チェックの対象が最初の `<script>` ブロックのみであることを明記
+
+### 修正｜`install.sh` を bash 3.2 で動くようにした（コミット `4d4d79b`・未記載だった変更）
+
+- `mapfile`（bash 4 以降専用）を `while read` に置き換え、macOS 標準の bash 3.2 でも
+  スキル検出が失敗しないようにした
+
+### 過去の項についての注記
+
+- v0.5.1 / v0.6.1 の項にある `scripts/apply-v051-fixes.sh` / `scripts/apply-v061-fixes.sh` は、
+  修正の適用後に削除済み（現在の `scripts/` は `install.sh` のみ）
+
+### ファイル構成の変更
+
+```
+変更:
+  README.md
+  CHANGELOG
+  websearch-slide-ja/SKILL.md                              （description のみ）
+  websearch-slide-ja/assets/scripts/validate-output.sh     （先頭コメントのみ）
+  websearch-slide-ja/references/markdown-format.md         （冒頭の注記のみ）
+  websearch-slide-ja/references/output-validation.md
+  websearch-slide-ja/references/example-outputs/README.md
+```
+
+---
 ## [v0.8.0] - 2026-07-23
 
 ### 追加｜mdss-convert委譲をプリフライト方式に、レガシー生成を恒久フォールバックに

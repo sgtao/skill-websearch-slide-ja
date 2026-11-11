@@ -15,6 +15,7 @@
 #   [7] CSS/JS リーク     style・script・svg 外への漏洩検出
 #   [8] プレースホルダ残留  {TITLE} / {SOURCE} 等が未置換でないか
 #   [9] 禁止ライブラリ     Chart.js / D3.js / <canvas> 等
+#   [10] 画像形式         <img src> に非画像ファイル（PDF 等）が混入していないか
 #
 # [4]と[5]の関係:
 #   [5] は grep による「function xxx(」の文字列存在チェックであり、

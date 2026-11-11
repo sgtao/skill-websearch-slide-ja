@@ -9,6 +9,7 @@ description: >
   また、スライドMarkdown（中間形式）に対応：生成時は .md と .html を両方出力し、
   「このMD（スライドMD）をスライドに変換して」「Markdownからスライドを生成して」
   「スライドをMarkdownで出力して」「このスライドHTMLをMDに逆変換して」でも起動する。
+  WebページやPDFをMarkdownに変換するだけの依頼（スライド化を伴わないもの）は対象外。
 ---
 
 # Slide Generator Skill with Web Search (Japanese)

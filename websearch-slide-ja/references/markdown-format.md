@@ -1,9 +1,15 @@
 # Markdown Format — スライドMD仕様（v0.7.0）
 
+> **本書の位置づけ**: `mdss-convert` が `--print-spec` に対応している環境では、
+> そちらの出力が最新仕様の正であり、本書は使わない（`references/cli-conversion.md` §3）。
+> 本書は **`--print-spec` が使えないとき、およびレガシートラック（LLM が直接 HTML を生成）**
+> のための仕様書で、内容は v0.7.0 時点のもの。CLI 側で後から追加された type・記法は含まない。
+
 スライドの中間表現である Markdown（スライドMD）の仕様。
 **MD が Single Source of Truth（正）であり、HTML は MD から毎回フル再生成する。**
-変換は LLM が行う（スクリプト化しない）。そのため再生成のたびに
+レガシートラックでは変換を LLM が行う（スクリプト化しない）。そのため再生成のたびに
 細部のデザイン（余白・座標・文言の細かい調整）が揺れうる。この揺れは仕様である。
+（CLI トラックでは `mdss-convert` が変換するため、同じ MD からは同じ HTML になる。）
 
 Step 4-A（MD生成）・Step 4-B（MD→HTML変換）・逆抽出（HTML→MD）で参照すること。
 

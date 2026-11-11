@@ -28,6 +28,7 @@
 | 7 | CSS/JSリーク | `<style>`/`<script>` 外にCSS定義・JS定義が漏れていないか | PASS/FAIL |
 | 8 | テンプレート残留 | `{TITLE}` `{SOURCE}` 等の未置換プレースホルダ | PASS/FAIL |
 | 9 | 禁止ライブラリ | Chart.js / D3.js / ECharts / mermaid.js / `<canvas>` の参照 | PASS/FAIL |
+| 10 | 画像形式 | `<img src>` に非画像ファイル（`.pdf` `.docx` `.pptx` `.xlsx` `.zip` `.html` 等）の URL が混入していないか | PASS/FAIL |
 
 ### JS 構文チェック（項目4）について
 
@@ -41,6 +42,8 @@
   この1箇所だけで `<script>` 内の全関数（`toggleTheme` 等）が定義されず、
   生成された HTML 上のボタンがすべて無反応になった。
 - `node` が使えない環境では WARN でスキップする（Errors には数えない）。
+- 対象は**最初の `<script>` ブロックのみ**（本スキルの生成物は `<script>` を 1 つだけ持つ前提）。
+  複数の `<script>` を持つ HTML では 2 つ目以降は検査されない。
 
 ---
 

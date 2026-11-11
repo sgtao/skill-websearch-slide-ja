@@ -3,6 +3,89 @@
 このスキルの変更履歴です。バージョンは [Semantic Versioning](https://semver.org/) に準拠。
 
 ---
+## [v0.9.0] - 2026-11-12
+
+### 変更｜SKILL.md をモード別のファイルに分割（読み込む量を減らす）
+
+SKILL.md（798 行）は、MD の変換だけを頼まれたときも、検索・目的確認・レガシートラックの実装まで
+すべて読み込まれていた。SKILL.md を入口（116 行）に絞り、手順を `workflows/` に分けた。
+**手順の文面は変えずに移した**（P2〜P5 で確定した規則・質問・完了報告はそのまま）。
+
+- **SKILL.md（入口）**: モード判定表／入力タイプ判定／モード別の必読ファイル表（どのモードで何を読むかの
+  唯一の正）／Step 番号と手順の場所の対応表／共通原則
+- **`workflows/`（新規・9 本）**
+
+| ファイル | 内容（移した元） |
+|---|---|
+| `create.md` | テーマの依頼（Step 0〜2、3-0、3、チェックリスト A） |
+| `convert-md.md` | スライドMD → HTML（エントリポイント B） |
+| `convert-raw.md` | 未整形の入力 → スライドMD → HTML（エントリポイント D。変換確認フロー） |
+| `extract.md` | HTML → MD（エントリポイント C） |
+| `edit.md` | 生成後の修正（スタイル変更の対話） |
+| `write-md.md` | MD を書く規則（type の選び分け、Step 4-A）。create と convert-raw で共通 |
+| `build.md` | Step 2.5（CLI 診断）、Step 4-B（変換）、デザイン原則、エクスポート機能、Step 5（出力・完了報告・自己検証）、チェックリスト B。各モードで共通 |
+| `legacy-build.md` | レガシートラックの生成手順・機能チェック表・チェックリスト C〜J。CLI が使えないときだけ読む |
+| `help.md` | 使い方を答える（下記） |
+
+- **CSS/JS の統合順の正（SSoT）を `workflows/legacy-build.md` に移動**。SKILL.md からは統合順の記載を削除
+- **references と `capture.mjs` の参照先を更新**: 「SKILL.md Step 4-A」などの参照を、移動先の
+  ファイル名と見出し名に書き換えた（内容の変更なし）
+- **読み込む量の目安（文字数ではなくバイト数）**: MD の変換では、SKILL.md 55KB →
+  SKILL.md＋`convert-md.md`＋`build.md` の 27KB
+
+### 追加｜ヘルプ機能と既定値の雛形
+
+- **help モード**: 「このスキルの使い方を教えて」「どう頼めばいい？」などで起動し、スライドを作らずに
+  使い方を答える。できること 4 つと頼み方の例／今の環境の状態（`mdss-convert` と Playwright の有無）／
+  既定値の雛形を、質問に応じて該当部分だけ返す。`description` にトリガーを追記
+- **`references/usage-guide.md`（新規）**: 頼み方の例、`CLAUDE.md` やプロジェクト指示に貼れる
+  既定値の雛形（作成目的・ロール・情報ソース・ビジュアル・パレット・枚数の目安・保存先・
+  スピーカーノート）、各項目の扱い
+- **既定値の読み取り（`workflows/create.md`）**: プロジェクトの指示に既定値の一覧があるとき、
+  その項目の質問を省略し、一覧を 1 回見せて確認する。書かれていない項目だけ質問する。
+  **作成可否の確認・情報量の下限チェック・検索フレーズの提示は省略しない**。依頼の文に違う指定が
+  あれば依頼の文を優先する。スキルが `CLAUDE.md` を勝手に編集することはない
+- **保存先（`workflows/build.md` Step 5-A）**: 既定値に保存先があれば、そこに保存する
+
+### 未確認
+
+- テーマ依頼（create）・未整形入力（convert-raw）・逆抽出（extract）・修正（edit）を、分割後のファイルで
+  通す確認（確認したのは、MD の変換と撮影、help の起動、参照先のパスと見出しがすべて存在すること）
+- 既定値を `CLAUDE.md` に貼った状態でのテーマ依頼（質問が省略され、確認が 1 回になること）
+- レガシートラック（`legacy-build.md`）での生成
+- Claude.ai での動作（ZIP に `workflows/` が入ることは確認。登録しての実行は未確認）
+
+### ファイル構成の変更
+
+```
+新規:
+  websearch-slide-ja/workflows/create.md
+  websearch-slide-ja/workflows/convert-md.md
+  websearch-slide-ja/workflows/convert-raw.md
+  websearch-slide-ja/workflows/extract.md
+  websearch-slide-ja/workflows/edit.md
+  websearch-slide-ja/workflows/write-md.md
+  websearch-slide-ja/workflows/build.md
+  websearch-slide-ja/workflows/legacy-build.md
+  websearch-slide-ja/workflows/help.md
+  websearch-slide-ja/references/usage-guide.md
+変更:
+  README.md
+  CHANGELOG
+  websearch-slide-ja/SKILL.md
+  websearch-slide-ja/assets/scripts/capture.mjs（コメント内の参照先のみ）
+  websearch-slide-ja/references/audience-purpose.md（以下 9 本は参照先のみ）
+  websearch-slide-ja/references/chart-generation.md
+  websearch-slide-ja/references/cli-conversion.md
+  websearch-slide-ja/references/environment.md
+  websearch-slide-ja/references/export-recipes.md
+  websearch-slide-ja/references/markdown-format.md
+  websearch-slide-ja/references/output-validation.md
+  websearch-slide-ja/references/self-review.md
+  websearch-slide-ja/references/source-selection.md
+```
+
+---
 ## [v0.8.6] - 2026-11-11
 
 ### 追加｜生成後の自己検証（lint → validator → 撮影して自分で見る）

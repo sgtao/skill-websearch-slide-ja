@@ -9,6 +9,8 @@ description: >
   また、スライドMarkdown（中間形式）に対応：生成時は .md と .html を両方出力し、
   「このMD（スライドMD）をスライドに変換して」「Markdownからスライドを生成して」
   「スライドをMarkdownで出力して」「このスライドHTMLをMDに逆変換して」でも起動する。
+  「このスキルの使い方を教えて」「websearch-slide-ja のヘルプ」「スライドはどう頼めばいい？」
+  のように使い方を尋ねられたときも起動する（スライドは作らずに使い方を答える）。
   WebページやPDFをMarkdownに変換するだけの依頼（スライド化を伴わないもの）は対象外。
 ---
 
@@ -36,6 +38,9 @@ description: >
 | C) スライドHTML添付＋「MDにして」「編集して」 | extract | `workflows/extract.md` |
 | D) 未準拠Markdown／CSV／会話履歴・プレーンテキスト | convert-raw | `workflows/convert-raw.md` |
 | この会話で作ったスライドの修正（「3枚目を2カラムにして」等）、編集した MD の再変換 | edit | `workflows/edit.md` |
+| 使い方の質問（「使い方を教えて」「どう頼めばいい？」「既定値を設定したい」） | help | `workflows/help.md` |
+
+help では**スライドを作らない**（作成可否の質問もしない）。
 
 添付物が Markdown・テキスト・表データのときは、次の「入力タイプ判定」で B か D かを決める。
 
@@ -58,20 +63,21 @@ description: >
 **この表が、どのモードで何を読むかの唯一の正**。●＝必ず読む、–＝読まない。
 条件つきの欄は、その条件に当たったときだけ読む。
 
-| ファイル | create | convert-md | convert-raw | extract | edit |
-|---|:-:|:-:|:-:|:-:|:-:|
-| `workflows/<モード>.md` | ● | ● | ● | ● | ● |
-| `references/environment.md` | ● | ● | ● | ● | ● |
-| `references/cli-conversion.md` | ● | ● | ● | ● | ● |
-| `workflows/build.md`（CLI診断・変換・出力と自己検証） | ● | ● | ● | 「Step 2.5」だけ | ● |
-| `workflows/write-md.md`（type の選び分け・MD を書く規則） | ● | – | ● | – | 内容を書き足すとき |
-| `references/audience-purpose.md` / `source-selection.md` / `role-signals.md` | ● | – | – | – | – |
-| `references/search-patterns/*`（該当 1 本） | Web検索時 | – | – | – | – |
-| `references/slide-layouts.md` / `example-outputs/README.md` | 構成設計時 | – | – | – | レガシーの `layout:` |
-| `references/chart-generation.md` / `diagram-generation.md` / `image-embedding.md` | グラフ・図解・画像を使うとき | – | 数値データを `chart` にするとき | – | – |
-| `references/markdown-format.md` | `--print-spec` 非対応、またはレガシー | 同左 | 同左 | CLI で逆抽出できないとき | 同左 |
-| `references/self-review.md` | 生成後 | 生成後 | 生成後 | – | 生成後 |
-| `workflows/legacy-build.md` と `assets/**`、`references/design-tokens.md` / `export-recipes.md` / `output-validation.md` | CLI が使えないときだけ | 同左 | 同左 | – | 同左 |
+| ファイル | create | convert-md | convert-raw | extract | edit | help |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|
+| `workflows/<モード>.md` | ● | ● | ● | ● | ● | ● |
+| `references/environment.md` | ● | ● | ● | ● | ● | シェルの手段だけ |
+| `references/cli-conversion.md` | ● | ● | ● | ● | ● | – |
+| `workflows/build.md`（CLI診断・変換・出力と自己検証） | ● | ● | ● | 「Step 2.5」だけ | ● | – |
+| `workflows/write-md.md`（type の選び分け・MD を書く規則） | ● | – | ● | – | 内容を書き足すとき | – |
+| `references/audience-purpose.md` / `source-selection.md` / `role-signals.md` | ● | – | – | – | – | – |
+| `references/search-patterns/*`（該当 1 本） | Web検索時 | – | – | – | – | – |
+| `references/slide-layouts.md` / `example-outputs/README.md` | 構成設計時 | – | – | – | レガシーの `layout:` | – |
+| `references/chart-generation.md` / `diagram-generation.md` / `image-embedding.md` | グラフ・図解・画像を使うとき | – | 数値データを `chart` にするとき | – | – | – |
+| `references/markdown-format.md` | `--print-spec` 非対応、またはレガシー | 同左 | 同左 | CLI で逆抽出できないとき | 同左 | – |
+| `references/self-review.md` | 生成後 | 生成後 | 生成後 | – | 生成後 | – |
+| `workflows/legacy-build.md` と `assets/**`、`references/design-tokens.md` / `export-recipes.md` / `output-validation.md` | CLI が使えないときだけ | 同左 | 同左 | – | 同左 | – |
+| `references/usage-guide.md`（頼み方の例・既定値の雛形と扱い） | 既定値があるとき | – | – | – | – | ● |
 
 - どのモードでも、他のモードの `workflows/*.md` は読まない
 - CLI が使える環境では `workflows/legacy-build.md` を読まない
@@ -100,7 +106,9 @@ description: >
 - **確認できない内容は書かない**。出典でもユーザー提供でも確認できない数値・固有名詞・実績は、
   値を書かずに `（要確認: ○○）` と書く（`workflows/write-md.md`「Step 4-A」）
 - **ユーザーが用意した MD・文章の本文は書き換えない**（B / D）。指摘は伝えて、直すかを確認する
-- **勝手に決めない**。作成可否・目的・情報ソース・ビジュアル方針は選択式で確認する
+- **勝手に決めない**。作成可否・目的・情報ソース・ビジュアル方針は選択式で確認する。
+  プロジェクトの指示に既定値があるときだけ、その項目の質問を省き、一覧で 1 回確認する
+  （`workflows/create.md`「既定値の読み取り」。作成可否は省略しない）
 - **提示の前に自己検証を行う**（保存 → 自己検証 → 提示の順）。足りない道具を自動でインストールしない
 - **HTML を提示するたびに完了報告の 7 項目を各 1 行で出す**（生成物／トラック／lint／要確認／
   情報ソース／未実施の検証／次にできること）。行っていない確認を「問題ありません」と書かない。

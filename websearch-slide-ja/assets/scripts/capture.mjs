@@ -21,7 +21,7 @@
  *   3  Playwright が使えない（未導入、またはブラウザ本体が未導入）
  *
  * 方針: Playwright を自動でインストールしない。無ければ 3 を返すだけにし、
- *       呼び出し側（SKILL.md Step 5-B）が撮影を飛ばす。
+ *       呼び出し側（`workflows/build.md`「Step 5」5-B）が撮影を飛ばす。
  * 対応: CLI トラック（mdss-convert）とレガシートラックの両方の HTML。
  */
 import { createRequire } from 'node:module';

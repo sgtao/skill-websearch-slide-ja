@@ -211,10 +211,10 @@ if (e.key === 'S' && e.shiftKey  && !e.ctrlKey) { e.preventDefault(); exportSing
 Step 4 で HTML 生成後、以下を確認する。
 
 ### CSS 統合
-- [ ] `print.css` を最後に統合した（統合するファイルと順序の正は SKILL.md の参照ファイルガイド／Step 4）
+- [ ] `print.css` を最後に統合した（統合するファイルと順序の正は `workflows/legacy-build.md`）
 
 ### JS 統合
-- [ ] `export-pdf.js` → `export-png.js` の相対順を守って統合した（全体の統合順の正は SKILL.md の参照ファイルガイド／Step 4）
+- [ ] `export-pdf.js` → `export-png.js` の相対順を守って統合した（全体の統合順の正は `workflows/legacy-build.md`）
 
 ### HTML 要素
 - [ ] `.control-cluster` 内に `.export-menu` を追加した

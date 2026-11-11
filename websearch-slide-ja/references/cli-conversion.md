@@ -126,7 +126,7 @@ Step 2.5でCLI利用不可と判定した場合、Step 3-0に進む前にユー�
 - **記法の説明が `--print-spec` と食い違う箇所は `--print-spec` を正とする**
   （v0.6.1 では `comparison-chart` の記法説明が食い違う。`tone: dark` の枚数目安も異なるため、
   少ない側の「1〜2枚」に合わせる）
-- 非対応の版では読まずに進める（`--print-spec` と SKILL.md Step 3 の表で足りる）
+- 非対応の版では読まずに進める（`--print-spec` と `workflows/write-md.md`「type の選び分け」の表で足りる）
 
 ### 3-3. `--sample-md`（迷ったときだけ）
 

@@ -255,7 +255,7 @@ graph LR
 
 ## 6. 変換規則（MD → HTML / Step 4-B）
 
-1. base-template を土台に、CSS/JS を SKILL.md の統合順（SSoT）どおり統合する（現行 Step 4 と同一）
+1. base-template を土台に、CSS/JS を `workflows/legacy-build.md` の統合順（SSoT）どおり統合する
 2. frontmatter `palette` があれば `<html data-palette="...">` を焼き込み、
    ドロップダウンの該当ボタンへ `is-active` を移す
 3. 各スライドをディレクティブの type に従い `slide-layouts.md` の雛形へ流し込む

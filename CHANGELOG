@@ -37,6 +37,29 @@
 - **クオリティチェックリスト（B）**: 自己検証の確認項目を追加
 - **README**: 特徴の一覧に 1 項目を追加
 
+### 未確認
+
+- Claude.ai での動作（ZIP を登録しての確認）
+- レガシートラックで HTML を生成し、`validate-output.sh` の自動実行まで通す確認
+- Playwright が無い環境でスキル全体を通す確認（`capture.mjs` が終了コード 3 を返すことは確認）
+- Web 検索ありのテーマ依頼での動作、16 枚を超えるときの確認の質問
+- `references/example-outputs/` の見本 HTML 5 本は、`validate-output.sh` で各 5 件 FAIL する
+  （パレット切替の追加より前に作られたため。見本の更新は未対応）
+
+### ファイル構成の変更
+
+```
+新規:
+  websearch-slide-ja/assets/scripts/capture.mjs
+  websearch-slide-ja/references/self-review.md
+変更:
+  README.md
+  CHANGELOG
+  websearch-slide-ja/SKILL.md
+  websearch-slide-ja/references/environment.md
+  websearch-slide-ja/references/output-validation.md
+```
+
 ---
 ## [v0.8.5] - 2026-11-11
 
